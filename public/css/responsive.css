@@ -1,0 +1,307 @@
+
+/* ========================================
+   RESPONSIVIDADE GLOBAL
+   Celular, tablet e computador
+======================================== */
+
+/* Evita que elementos ultrapassem a tela */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  width: 100%;
+  min-width: 320px;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  width: 100%;
+  min-width: 320px;
+  margin: 0;
+  overflow-x: hidden;
+}
+
+img,
+video,
+iframe,
+canvas,
+svg {
+  max-width: 100%;
+}
+
+input,
+textarea,
+select,
+button {
+  max-width: 100%;
+  font-size: 16px;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  touch-action: manipulation;
+}
+
+.container,
+main,
+section,
+.panel,
+.card {
+  min-width: 0;
+}
+
+/* ========================================
+   TABLETS
+======================================== */
+
+@media (max-width: 900px) {
+  .container {
+    width: 94%;
+  }
+
+  .stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .dashboard-header {
+    flex-wrap: wrap;
+  }
+
+  .occurrence-tabs {
+    gap: 5px;
+  }
+
+  .occurrence-tab {
+    padding: 12px 8px;
+  }
+}
+
+/* ========================================
+   CELULARES
+======================================== */
+
+@media (max-width: 650px) {
+  .container {
+    width: 92%;
+    max-width: 100%;
+  }
+
+  .topbar {
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 16px 0;
+    margin-bottom: 22px;
+  }
+
+  .topbar h2 {
+    font-size: 16px;
+    overflow-wrap: anywhere;
+  }
+
+  .panel {
+    width: 100%;
+    max-width: 100%;
+    margin: 20px auto;
+    padding: 18px;
+    border-radius: 14px;
+  }
+
+  /* Formulários */
+  .tabs {
+    gap: 6px;
+  }
+
+  .tabs button {
+    padding: 12px 8px;
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* Cabeçalho do painel */
+  .dashboard-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .dashboard-header h1 {
+    font-size: 23px;
+    overflow-wrap: anywhere;
+  }
+
+  .header-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .header-actions button {
+    min-height: 42px;
+  }
+
+  /* Indicadores */
+  .stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 7px;
+  }
+
+  .stat {
+    min-width: 0;
+    padding: 12px 8px;
+    overflow-wrap: anywhere;
+  }
+
+  .stat strong {
+    font-size: 22px;
+  }
+
+  /* Abas de chamados */
+  .occurrence-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
+    padding: 4px;
+  }
+
+  .occurrence-tab {
+    min-width: 0;
+    flex-direction: column;
+    gap: 6px;
+    padding: 11px 3px;
+    font-size: 10px;
+    overflow-wrap: anywhere;
+  }
+
+  .tab-count {
+    padding: 3px 7px;
+  }
+
+  /* Lista e cartões */
+  .occurrences-panel {
+    padding: 13px;
+    min-width: 0;
+  }
+
+  .list-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .connection-status {
+    white-space: normal;
+  }
+
+  .occurrence {
+    min-width: 0;
+    padding: 14px;
+  }
+
+  .occurrence-top {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .occurrence h3 {
+    overflow-wrap: anywhere;
+  }
+
+  .occurrence-footer {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .occurrence-actions {
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .action-button {
+    flex: 1 1 120px;
+    min-height: 44px;
+    padding: 11px 8px;
+  }
+
+  /* Notificações */
+  .toast {
+    right: 12px;
+    bottom: 12px;
+    left: 12px;
+    width: auto;
+    max-width: none;
+    overflow-wrap: anywhere;
+  }
+
+  /* Rodapé */
+  footer {
+    padding: 28px 10px;
+  }
+}
+
+/* ========================================
+   CELULARES PEQUENOS
+======================================== */
+
+@media (max-width: 380px) {
+  .container {
+    width: 94%;
+  }
+
+  .panel {
+    padding: 14px;
+  }
+
+  .dashboard-header h1 {
+    font-size: 21px;
+  }
+
+  .stats {
+    gap: 5px;
+  }
+
+  .stat {
+    padding: 10px 5px;
+    font-size: 9px;
+  }
+
+  .stat strong {
+    font-size: 19px;
+  }
+
+  .occurrences-panel {
+    padding: 9px;
+  }
+
+  .occurrence-tab {
+    font-size: 9px;
+  }
+}
+
+/* ========================================
+   ACESSIBILIDADE
+======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

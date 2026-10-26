@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full bg-slate-950 text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Central de Ocorrências — Arena de Pernambuco</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Ícones Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-functions-compat.js"></script>
+
+    <!-- CSS do projeto -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="h-full flex flex-col font-sans bg-navy-950 text-slate-100 antialiased selection:bg-brand-500 selection:text-white">
+
+    <!-- CABEÇALHO -->
+    <header class="bg-navy-900/90 border-b border-slate-800 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-center h-16 sm:h-20">
+
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('visitor')">
+                    <div class="p-2.5 bg-brand-600/20 border border-brand-500/30 rounded-xl text-brand-500">
+                        <i data-lucide="shield-alert" class="w-6 h-6 sm:w-7 sm:h-7"></i>
+                    </div>
+
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-widest text-brand-500 bg-brand-950/80 border border-brand-800/50 px-2 py-0.5 rounded-full">
+                            Evento Together
+                        </span>
+                        <h1 class="text-lg sm:text-xl font-bold tracking-tight text-white">Central de Ocorrências</h1>
+                        <p class="text-xs text-slate-400 hidden sm:block">Arena de Pernambuco — Recife-PE</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-2 sm:space-x-3">
+                 
+
+                 
+
+                  
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+
+        <!-- ABA 1: VISITANTE -->
+        <section id="tabVisitor" class="space-y-6">
+            <div class="bg-navy-900 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl">
+
+                <div class="max-w-3xl mb-6">
+                    <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+                        <i data-lucide="map-pin" class="text-brand-500"></i>
+                        Registrar Ocorrência na Arena
+                    </h2>
+                    <p class="text-sm text-slate-400 mt-1">
+                        Selecione a categoria do problema, toque no setor correspondente no mapa e descreva o que aconteceu.
+                    </p>
+                </div>
+
+                <form id="visitorForm" onsubmit="submitOccurrence(event)" class="space-y-6">
+
+                    <!-- CATEGORIAS -->
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">
+                            1. Selecione a categoria do problema
+                        </label>
+
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+
+                            <label class="relative flex flex-col items-center p-3.5 bg-slate-900/80 border border-slate-800 rounded-xl cursor-pointer hover:border-brand-500/50 transition-all text-center group">
+                                <input type="radio" name="category" value="Hidráulica / Vazamento" required class="peer sr-only">
+                                <div class="p-2.5 rounded-lg bg-blue-500/10 text-blue-400 peer-checked:bg-brand-500 peer-checked:text-white">
+                                    <i data-lucide="droplets" class="w-5 h-5"></i>
+                                </div>
+                                <span class="text-xs sm:text-sm font-medium mt-2 text-slate-300 peer-checked:text-white">Hidráulica / Vazamento</span>
+                                <div class="absolute inset-0 border-2 border-brand-500 rounded-xl opacity-0 peer-checked:opacity-100 pointer-events-none"></div>
+                            </label>
+
+                            <label class="relative flex flex-col items-center p-3.5 bg-slate-900/80 border border-slate-800 rounded-xl cursor-pointer hover:border-brand-500/50 transition-all text-center group">
+                                <input type="radio" name="category" value="Elétrica / Iluminação" class="peer sr-only">
+                                <div class="p-2.5 rounded-lg bg-amber-500/10 text-amber-400 peer-checked:bg-brand-500 peer-checked:text-white">
+                                    <i data-lucide="zap" class="w-5 h-5"></i>
+                                </div>
+                                <span class="text-xs sm:text-sm font-medium mt-2 text-slate-300 peer-checked:text-white">Elétrica / Iluminação</span>
+                                <div class="absolute inset-0 border-2 border-brand-500 rounded-xl opacity-0 peer-checked:opacity-100 pointer-events-none"></div>
+                            </label>
+
+                            <label class="relative flex flex-col items-center p-3.5 bg-slate-900/80 border border-slate-800 rounded-xl cursor-pointer hover:border-brand-500/50 transition-all text-center group">
+                                <input type="radio" name="category" value="Limpeza / Sanitários" class="peer sr-only">
+                                <div class="p-2.5 rounded-lg bg-emerald-500/10 text-emerald-400 peer-checked:bg-brand-500 peer-checked:text-white">
+                                    <i data-lucide="sparkles" class="w-5 h-5"></i>
+                                </div>
+                                <span class="text-xs sm:text-sm font-medium mt-2 text-slate-300 peer-checked:text-white">Limpeza / Banheiros</span>
+                                <div class="absolute inset-0 border-2 border-brand-500 rounded-xl opacity-0 peer-checked:opacity-100 pointer-events-none"></div>
+                            </label>
+
+                            <label class="relative flex flex-col items-center p-3.5 bg-slate-900/80 border border-slate-800 rounded-xl cursor-pointer hover:border-brand-500/50 transition-all text-center group">
+                                <input type="radio" name="category" value="Estrutura / Mobiliário" class="peer sr-only">
+                                <div class="p-2.5 rounded-lg bg-purple-500/10 text-purple-400 peer-checked:bg-brand-500 peer-checked:text-white">
+                                    <i data-lucide="hammer" class="w-5 h-5"></i>
+                                </div>
+                                <span class="text-xs sm:text-sm font-medium mt-2 text-slate-300 peer-checked:text-white">Estrutura / Assentos</span>
+                                <div class="absolute inset-0 border-2 border-brand-500 rounded-xl opacity-0 peer-checked:opacity-100 pointer-events-none"></div>
+                            </label>
+
+                            <label class="relative flex flex-col items-center p-3.5 bg-slate-900/80 border border-slate-800 rounded-xl cursor-pointer hover:border-brand-500/50 transition-all text-center group">
+                                <input type="radio" name="category" value="Acesso / Sinalização" class="peer sr-only">
+                                <div class="p-2.5 rounded-lg bg-rose-500/10 text-rose-400 peer-checked:bg-brand-500 peer-checked:text-white">
+                                    <i data-lucide="signpost" class="w-5 h-5"></i>
+                                </div>
+                                <span class="text-xs sm:text-sm font-medium mt-2 text-slate-300 peer-checked:text-white">Acesso / Sinalização</span>
+                                <div class="absolute inset-0 border-2 border-brand-500 rounded-xl opacity-0 peer-checked:opacity-100 pointer-events-none"></div>
+                            </label>
+
+                            <label class="relative flex flex-col items-center p-3.5 bg-slate-900/80 border border-slate-800 rounded-xl cursor-pointer hover:border-brand-500/50 transition-all text-center group">
+                                <input type="radio" name="category" value="Outros" class="peer sr-only">
+                                <div class="p-2.5 rounded-lg bg-slate-500/10 text-slate-400 peer-checked:bg-brand-500 peer-checked:text-white">
+                                    <i data-lucide="more-horizontal" class="w-5 h-5"></i>
+                                </div>
+                                <span class="text-xs sm:text-sm font-medium mt-2 text-slate-300 peer-checked:text-white">Outros</span>
+                                <div class="absolute inset-0 border-2 border-brand-500 rounded-xl opacity-0 peer-checked:opacity-100 pointer-events-none"></div>
+                            </label>
+
+                        </div>
+                    </div>
+
+                    <!-- MAPA E LOCALIZAÇÃO -->
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+                        <div class="lg:col-span-7 bg-slate-900/90 border border-slate-800 rounded-xl p-3 sm:p-4 overflow-hidden shadow-inner">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">2. Toque no setor do ocorrido</span>
+                                <span id="selectedSectorBadge" class="text-xs font-bold text-brand-400 bg-brand-950 px-2.5 py-1 rounded-full border border-brand-800">
+                                    Nenhum setor selecionado
+                                </span>
+                            </div>
+
+                            <div class="relative w-full aspect-[3/4] max-h-[500px] mx-auto flex items-center justify-center">
+                                <svg viewBox="0 0 800 1100" class="w-full h-full select-none" id="arenaMapSvg">
+                                    <rect width="800" height="1100" fill="#080e18" rx="20"/>
+                                    <path d="M 300,0 C 250,200 400,300 280,500 C 160,700 750,550 780,1100" fill="none" stroke="#1e3a8a" stroke-width="35" opacity="0.3"/>
+
+                                    <!-- Estacionamento P1 -->
+                                    <g id="sector-P1" class="map-sector" onclick="selectSector('P1', 'Estacionamento P1 (Norte/Oeste)')">
+                                        <polygon points="50,70 280,70 200,320 80,260" fill="#2563eb" fill-opacity="0.6"/>
+                                        <text x="160" y="180" fill="#fff" font-size="28" font-weight="bold" text-anchor="middle">P1</text>
+                                    </g>
+
+                                    <!-- Estacionamento P2 -->
+                                    <g id="sector-P2" class="map-sector" onclick="selectSector('P2', 'Estacionamento P2 (Norte/Leste)')">
+                                        <polygon points="400,130 600,130 610,320 420,280" fill="#2563eb" fill-opacity="0.6"/>
+                                        <text x="510" y="220" fill="#fff" font-size="28" font-weight="bold" text-anchor="middle">P2</text>
+                                    </g>
+
+                                    <!-- Áreas externas -->
+                                    <g id="sector-X1-Top" class="map-sector" onclick="selectSector('X1', 'Áreas Externas / Praça de Convivência')">
+                                        <path d="M 330,80 L 390,80 L 380,240 L 320,200 Z" fill="#7c3aed" fill-opacity="0.6"/>
+                                        <text x="355" y="150" fill="#fff" font-size="18" font-weight="bold" text-anchor="middle">X1</text>
+                                    </g>
+
+                                    <g id="sector-X1-Left" class="map-sector" onclick="selectSector('X1', 'Áreas Externas / Entorno Oeste')">
+                                        <path d="M 170,440 L 220,440 L 220,680 L 160,680 Z" fill="#7c3aed" fill-opacity="0.6"/>
+                                        <text x="190" y="560" fill="#fff" font-size="20" font-weight="bold" text-anchor="middle">X1</text>
+                                    </g>
+
+                                    <g id="sector-X1-Right" class="map-sector" onclick="selectSector('X1', 'Áreas Externas / Entorno Leste')">
+                                        <path d="M 580,440 L 640,440 L 630,680 L 590,680 Z" fill="#7c3aed" fill-opacity="0.6"/>
+                                        <text x="610" y="560" fill="#fff" font-size="20" font-weight="bold" text-anchor="middle">X1</text>
+                                    </g>
+
+                                    <!-- Campo central -->
+                                    <rect x="330" y="530" width="140" height="90" fill="#15803d" stroke="#22c55e" stroke-width="3" rx="4"/>
+                                    <line x1="400" y1="530" x2="400" y2="620" stroke="#fff" stroke-width="2" opacity="0.6"/>
+                                    <circle cx="400" cy="575" r="18" fill="none" stroke="#fff" stroke-width="2" opacity="0.6"/>
+
+                                    <!-- Arquibancada A1 -->
+                                    <g id="sector-A1" class="map-sector" onclick="selectSector('A1', 'Arquibancada A1 (Norte)')">
+                                        <path d="M 270,430 C 340,390 460,390 530,430 L 510,510 C 440,480 360,480 290,510 Z" fill="#0284c7" fill-opacity="0.8"/>
+                                        <text x="400" y="465" fill="#fff" font-size="24" font-weight="bold" text-anchor="middle">A1</text>
+                                    </g>
+
+                                    <!-- Arquibancada A2 -->
+                                    <g id="sector-A2" class="map-sector" onclick="selectSector('A2', 'Arquibancada A2 (Leste)')">
+                                        <path d="M 535,435 C 580,510 580,640 535,715 L 485,670 C 510,620 510,530 485,480 Z" fill="#0d9488" fill-opacity="0.8"/>
+                                        <text x="525" y="580" fill="#fff" font-size="24" font-weight="bold" text-anchor="middle">A2</text>
+                                    </g>
+
+                                    <!-- Arquibancada A3 -->
+                                    <g id="sector-A3" class="map-sector" onclick="selectSector('A3', 'Arquibancada A3 (Sul)')">
+                                        <path d="M 270,720 C 340,760 460,760 530,720 L 510,640 C 440,670 360,670 290,640 Z" fill="#d97706" fill-opacity="0.8"/>
+                                        <text x="400" y="695" fill="#fff" font-size="24" font-weight="bold" text-anchor="middle">A3</text>
+                                    </g>
+
+                                    <!-- Arquibancada A4 -->
+                                    <g id="sector-A4" class="map-sector" onclick="selectSector('A4', 'Arquibancada A4 (Oeste)')">
+                                        <path d="M 265,435 C 220,510 220,640 265,715 L 315,670 C 290,620 290,530 315,480 Z" fill="#7c3aed" fill-opacity="0.8"/>
+                                        <text x="275" y="580" fill="#fff" font-size="24" font-weight="bold" text-anchor="middle">A4</text>
+                                    </g>
+
+                                    <!-- Acesso E1 -->
+                                    <g id="sector-E1" class="map-sector" onclick="selectSector('E1', 'Acesso Principal E1 (Sul)')">
+                                        <polygon points="360,780 440,780 450,830 350,830" fill="#e11d48" fill-opacity="0.85"/>
+                                        <text x="400" y="812" fill="#fff" font-size="22" font-weight="bold" text-anchor="middle">E1</text>
+                                    </g>
+
+                                    <!-- Estacionamento P3 -->
+                                    <g id="sector-P3-Left" class="map-sector" onclick="selectSector('P3', 'Estacionamento P3 (Sul/Oeste)')">
+                                        <path d="M 180,740 L 330,780 L 320,930 L 180,900 Z" fill="#2563eb" fill-opacity="0.6"/>
+                                        <text x="250" y="850" fill="#fff" font-size="26" font-weight="bold" text-anchor="middle">P3</text>
+                                    </g>
+
+                                    <g id="sector-P3-Right" class="map-sector" onclick="selectSector('P3', 'Estacionamento P3 (Sul/Leste)')">
+                                        <path d="M 470,780 L 620,740 L 620,900 L 480,930 Z" fill="#2563eb" fill-opacity="0.6"/>
+                                        <text x="550" y="850" fill="#fff" font-size="26" font-weight="bold" text-anchor="middle">P3</text>
+                                    </g>
+
+                                    <!-- Legenda -->
+                                    <g transform="translate(560, 30)">
+                                        <rect width="210" height="150" fill="#0f172a" fill-opacity="0.9" rx="8" stroke="#334155"/>
+                                        <text x="15" y="25" fill="#f8fafc" font-size="12" font-weight="bold">LEGENDA DO MAPA</text>
+                                        <rect x="15" y="40" width="12" height="12" fill="#0284c7" rx="2"/>
+                                        <text x="35" y="51" fill="#cbd5e1" font-size="11">A = Arquibancadas</text>
+                                        <rect x="15" y="62" width="12" height="12" fill="#2563eb" rx="2"/>
+                                        <text x="35" y="73" fill="#cbd5e1" font-size="11">P = Estacionamentos</text>
+                                        <rect x="15" y="84" width="12" height="12" fill="#e11d48" rx="2"/>
+                                        <text x="35" y="95" fill="#cbd5e1" font-size="11">E = Acessos Principais</text>
+                                        <rect x="15" y="106" width="12" height="12" fill="#7c3aed" rx="2"/>
+                                        <text x="35" y="117" fill="#cbd5e1" font-size="11">X = Áreas Externas</text>
+                                    </g>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <!-- DETALHES DO LOCAL -->
+                        <div class="lg:col-span-5 space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+                                    3. Local confirmado / detalhado
+                                </label>
+                                <input type="text" id="locationInput" name="location" required readonly placeholder="Toque no mapa acima para escolher" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 font-medium focus:outline-none focus:ring-2 focus:ring-brand-500">
+                                <p class="text-xs text-slate-500 mt-1">
+                                    Exemplo: Arquibancada A1, próximo ao Bloco B, ou banheiro masculino P2.
+                                </p>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+                                    4. Descrição da ocorrência
+                                </label>
+                                <textarea id="descriptionInput" name="description" rows="4" required maxlength="1500" placeholder="Descreva o problema encontrado..." class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm"></textarea>
+                            </div>
+
+                            <button type="submit" id="submitBtn" class="w-full py-4 px-6 bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-500 hover:to-brand-400 text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center space-x-2 text-base">
+                                <i data-lucide="send" class="w-5 h-5"></i>
+                                <span>Registrar Ocorrência Agora</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- ABA 2: MANUTENÇÃO -->
+        <section id="tabStaff" class="hidden space-y-6">
+
+            <div id="staffAuthBox" class="max-w-md mx-auto bg-navy-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl">
+                <div class="text-center mb-6">
+                    <div class="inline-flex p-3 bg-brand-500/10 border border-brand-500/30 rounded-2xl text-brand-400 mb-3">
+                        <i data-lucide="wrench" class="w-8 h-8"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-white">Acesso da Manutenção</h2>
+                    <p class="text-xs text-slate-400 mt-1">
+                        Informe seu nome e o código de acesso fornecido pela organização.
+                    </p>
+                </div>
+
+                <form onsubmit="handleStaffLogin(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Seu nome / identificação</label>
+                        <input type="text" id="staffNameInput" maxlength="80" required placeholder="Ex.: Carlos Silva" class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Código de acesso (6 caracteres)</label>
+                        <input type="text" id="staffCodeInput" minlength="6" maxlength="6" pattern="[A-Za-z0-9]{6}" required autocomplete="one-time-code" placeholder="Ex.: A8K9X2" class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white font-mono uppercase tracking-widest text-center text-lg focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+
+                    <button type="submit" class="w-full py-3.5 bg-brand-600 hover:bg-brand-500 text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center space-x-2">
+                        <i data-lucide="log-in" class="w-5 h-5"></i>
+                        <span>Acessar Painel de Operações</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- PAINEL DA EQUIPE -->
+            <div id="staffDashboard" class="hidden space-y-6">
+                <div class="bg-navy-900 border border-slate-800 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-full bg-brand-600/20 border border-brand-500/40 flex items-center justify-center text-brand-400 font-bold">
+                            <span id="staffAvatar">M</span>
+                        </div>
+                        <div>
+                            <span class="text-xs text-slate-400 uppercase font-bold tracking-wider">Técnico em atendimento</span>
+                            <h3 id="staffDisplayName" class="text-lg font-bold text-white">Carregando...</h3>
+                        </div>
+                    </div>
+
+                    <button onclick="logoutStaff()" class="px-4 py-2 text-xs font-semibold text-rose-400 hover:text-rose-300 bg-rose-500/10 border border-rose-500/30 rounded-lg transition-all flex items-center space-x-1.5">
+                        <i data-lucide="log-out" class="w-4 h-4"></i>
+                        <span>Encerrar sessão</span>
+                    </button>
+                </div>
+
+                <!-- CONTADORES -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="bg-navy-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-wider text-amber-400">Em aberto</p>
+                            <p id="countOpen" class="text-3xl font-extrabold text-white mt-1">0</p>
+                        </div>
+                        <i data-lucide="clock" class="w-6 h-6 text-amber-400"></i>
+                    </div>
+
+                    <div class="bg-navy-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-wider text-blue-400">Em atendimento</p>
+                            <p id="countProgress" class="text-3xl font-extrabold text-white mt-1">0</p>
+                        </div>
+                        <i data-lucide="loader" class="w-6 h-6 text-blue-400"></i>
+                    </div>
+
+                    <div class="bg-navy-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-wider text-emerald-400">Finalizadas</p>
+                            <p id="countDone" class="text-3xl font-extrabold text-white mt-1">0</p>
+                        </div>
+                        <i data-lucide="check-circle-2" class="w-6 h-6 text-emerald-400"></i>
+                    </div>
+                </div>
+
+                <!-- LISTA DE OCORRÊNCIAS -->
+                <div class="bg-navy-900 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i data-lucide="list-filter" class="text-brand-500"></i>
+                            Fila de Ocorrências da Arena
+                        </h3>
+
+                        <div class="flex flex-wrap items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
+                            <button onclick="filterStaffList('all')" id="filterBtnAll" class="px-3 py-1.5 rounded-lg font-medium text-white bg-brand-600">Todas</button>
+                            <button onclick="filterStaffList('open')" id="filterBtnOpen" class="px-3 py-1.5 rounded-lg font-medium text-slate-400">Abertas</button>
+                            <button onclick="filterStaffList('progress')" id="filterBtnProgress" class="px-3 py-1.5 rounded-lg font-medium text-slate-400">Em atendimento</button>
+                            <button onclick="filterStaffList('done')" id="filterBtnDone" class="px-3 py-1.5 rounded-lg font-medium text-slate-400">Finalizadas</button>
+                        </div>
+                    </div>
+
+                    <div id="staffOccurrencesList" class="space-y-3 min-h-[250px]">
+                        <div class="text-center py-12 text-slate-500 text-sm">
+                            <i data-lucide="inbox" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
+                            As ocorrências aparecerão aqui.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ABA 3: ADMINISTRADOR -->
+        <section id="tabAdmin" class="hidden space-y-6">
+            <div class="max-w-2xl mx-auto bg-navy-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl">
+
+                <!-- LOGIN ADMINISTRATIVO -->
+                <div id="adminAuthBox" class="text-center space-y-4">
+                    <div class="inline-flex p-3 bg-purple-500/10 border border-purple-500/30 rounded-2xl text-purple-400">
+                        <i data-lucide="shield-check" class="w-8 h-8"></i>
+                    </div>
+
+                    <h2 class="text-2xl font-bold text-white">Painel do Administrador</h2>
+                    <p class="text-xs text-slate-400 max-w-md mx-auto">
+                        Acesso restrito ao administrador autorizado para geração de códigos temporários da equipe.
+                    </p>
+
+                    <button onclick="loginAdminGoogle()" class="px-6 py-3.5 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-xl border border-slate-700 transition-all flex items-center justify-center space-x-3 mx-auto shadow-lg">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
+                            <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.2 9 5 12 5z"/>
+                            <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.7-.2-2.3H12v4.6h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"/>
+                            <path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 10.8 0 12s.7 2.3 1.9 4.7l3.7-1.9z"/>
+                            <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.2-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z"/>
+                        </svg>
+                        <span>Entrar com Google</span>
+                    </button>
+                </div>
+
+                <!-- PAINEL ADMINISTRATIVO -->
+                <div id="adminPanel" class="hidden space-y-6">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                        <div>
+                            <span class="text-xs font-bold uppercase tracking-wider text-purple-400">Sessão administrativa</span>
+                            <h3 id="adminEmail" class="text-sm font-semibold text-white">Administrador autorizado</h3>
+                        </div>
+                        <button onclick="logoutAdmin()" class="text-xs text-slate-400 hover:text-white underline">Sair</button>
+                    </div>
+
+                    <div class="space-y-4">
+                        <h4 class="text-base font-bold text-white flex items-center gap-2">
+                            <i data-lucide="key" class="text-brand-500"></i>
+                            Gerar código temporário para técnico
+                        </h4>
+
+                        <p class="text-xs text-slate-400">
+                            O código será válido por 24 horas. Compartilhe-o somente com a equipe autorizada.
+                        </p>
+
+                        <button onclick="generateAccessCode()" class="w-full py-3.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center space-x-2">
+                            <i data-lucide="sparkles" class="w-5 h-5"></i>
+                            <span>Gerar novo código de 6 caracteres</span>
+                        </button>
+
+                        <div id="generatedCodeBox" class="hidden bg-slate-950 border border-purple-500/40 rounded-xl p-4 text-center space-y-2">
+                            <span class="text-xs uppercase text-slate-400 font-semibold">Código gerado</span>
+
+                            <div class="flex items-center justify-center space-x-3">
+                                <span id="codeDisplay" class="text-3xl font-mono font-extrabold text-brand-400 tracking-widest">------</span>
+                                <button onclick="copyGeneratedCode()" class="p-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg border border-slate-700" title="Copiar código">
+                                    <i data-lucide="copy" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+
+                            <p class="text-[11px] text-amber-400">Expira em 24 horas.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- RODAPÉ -->
+    <footer class="bg-navy-900 border-t border-slate-800 py-4 px-6 text-center text-xs text-slate-500 mt-auto">
+        <p>© 2026 Arena de Pernambuco — Evento Together. Central de Operações de Manutenção.</p>
+    </footer>
+
+    <!-- JAVASCRIPT DO PROJETO -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/map.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

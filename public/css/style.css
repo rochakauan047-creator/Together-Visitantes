@@ -1,0 +1,38 @@
+        /* Map Custom Hover & Active States */
+        .map-sector {
+            transition: all 0.25s ease-in-out;
+            cursor: pointer;
+            stroke-width: 2;
+            stroke: rgba(255, 255, 255, 0.4);
+        }
+        .map-sector:hover {
+            filter: brightness(1.25);
+            stroke: #38bdf8;
+            stroke-width: 3;
+        }
+        .map-sector.active {
+            filter: brightness(1.4);
+            stroke: #22d3ee;
+            stroke-width: 4;
+            animation: pulse-border 1.5s infinite;
+        }
+        @keyframes pulse-border {
+            0%, 100% { stroke-opacity: 1; }
+            50% { stroke-opacity: 0.4; }
+        }
+        
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090d16;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }

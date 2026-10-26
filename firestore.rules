@@ -1,0 +1,80 @@
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email == 'rochakauan047@gmail.com'
+        && request.auth.token.email_verified == true;
+    }
+
+    function isStaff() {
+      return request.auth != null
+        && request.auth.token.staff == true;
+    }
+
+    // Visitantes podem criar ocorrências.
+    // Somente administrador ou equipe autenticada podem consultá-las.
+    match /occurrences/{occurrenceId} {
+      allow create: if
+        request.resource.data.status == 'open'
+        && request.resource.data.category is string
+        && request.resource.data.location is string
+        && request.resource.data.description is string
+        && request.resource.data.keys().hasOnly([
+          'category',
+          'sectorCode',
+          'location',
+          'description',
+          'status',
+          'createdAt',
+          'history'
+        ]);
+
+      allow read: if isAdmin() || isStaff();
+
+      allow update: if (isAdmin() || isStaff())
+        && request.resource.data.diff(resource.data)
+          .affectedKeys().hasOnly([
+            'status',
+            'updatedAt',
+            'assignedTo',
+            'assignedAt',
+            'completedBy',
+            'completedAt'
+          ])
+        && request.resource.data.status in [
+          'open',
+          'progress',
+          'done'
+        ];
+
+      allow delete: if isAdmin();
+    }
+
+    // Códigos e limites de tentativas só podem ser acessados
+    // pelo backend usando o Firebase Admin SDK.
+    match /access_codes/{codeHash} {
+      allow read, write: if false;
+    }
+
+    match /loginRateLimits/{limitId} {
+      allow read, write: if false;
+    }
+
+    // Perfis da equipe.
+    match /staffUsers/{userId} {
+      allow read: if request.auth != null
+        && request.auth.uid == userId;
+
+      allow write: if isAdmin();
+    }
+
+    // Bloqueia todas as outras coleções por padrão.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
