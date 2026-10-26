@@ -16,26 +16,37 @@
         // ==========================================
         // 2. NAVIGATION & TAB SWITCHING
         // ==========================================
-        function switchTab(tab) {
-            document.getElementById('tabVisitor').classList.add('hidden');
-            document.getElementById('tabStaff').classList.add('hidden');
-            document.getElementById('tabAdmin').classList.add('hidden');
 
-            document.getElementById('navBtnVisitor').className = "px-3 py-2 text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 border border-slate-700/60 rounded-lg transition-all flex items-center space-x-1.5";
-            document.getElementById('navBtnStaff').className = "px-3 py-2 text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 border border-slate-700/60 rounded-lg transition-all flex items-center space-x-1.5";
+function switchTab(tab) {
+    const abas = {
+        visitor: document.getElementById('tabVisitor'),
+        staff: document.getElementById('tabStaff'),
+        admin: document.getElementById('tabAdmin')
+    };
 
-            if (tab === 'visitor') {
-                document.getElementById('tabVisitor').classList.remove('hidden');
-                document.getElementById('navBtnVisitor').className = "px-3 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors flex items-center space-x-1.5 bg-brand-600 text-white shadow-lg shadow-brand-600/20";
-            } else if (tab === 'staff') {
-                document.getElementById('tabStaff').classList.remove('hidden');
-                document.getElementById('navBtnStaff').className = "px-3 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors flex items-center space-x-1.5 bg-brand-600 text-white shadow-lg shadow-brand-600/20";
-                checkStaffSession();
-            } else if (tab === 'admin') {
-                document.getElementById('tabAdmin').classList.remove('hidden');
-                checkAdminSession();
-            }
-        }
+    if (!abas[tab]) {
+        console.error('Aba não encontrada:', tab);
+        return;
+    }
+
+    Object.values(abas).forEach(aba => {
+        aba.classList.add('hidden');
+    });
+
+    abas[tab].classList.remove('hidden');
+
+    if (tab === 'staff') {
+        checkStaffSession();
+    }
+
+    if (tab === 'admin') {
+        checkAdminSession();
+    }
+
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+}
 
         // ==========================================
         // 4. VISITOR FORM SUBMISSION
