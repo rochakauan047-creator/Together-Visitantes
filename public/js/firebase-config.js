@@ -1,4 +1,9 @@
 
+/* =========================================
+   TOGETHER-VISITANTES
+   Configuração e inicialização do Firebase
+   ========================================= */
+
 const firebaseConfig = {
   apiKey: "AIzaSyBLVAurkgdjN3xzlk5gm1lvfJEwnL2UpaY",
   authDomain: "together-cont.firebaseapp.com",
@@ -9,9 +14,13 @@ const firebaseConfig = {
   measurementId: "G-PP03ZFZ43T"
 };
 
+// Evita inicializar o Firebase mais de uma vez.
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
 
-const auth = firebase.auth();
-const db = firebase.firestore();
+// Disponibiliza os serviços para os demais arquivos JS.
+window.auth = firebase.auth();
+window.db = firebase.firestore();
+
+console.log("Firebase inicializado com sucesso.");
