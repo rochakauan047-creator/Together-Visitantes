@@ -1,38 +1,182 @@
-        /* Map Custom Hover & Active States */
-        .map-sector {
-            transition: all 0.25s ease-in-out;
-            cursor: pointer;
-            stroke-width: 2;
-            stroke: rgba(255, 255, 255, 0.4);
-        }
-        .map-sector:hover {
-            filter: brightness(1.25);
-            stroke: #38bdf8;
-            stroke-width: 3;
-        }
-        .map-sector.active {
-            filter: brightness(1.4);
-            stroke: #22d3ee;
-            stroke-width: 4;
-            animation: pulse-border 1.5s infinite;
-        }
-        @keyframes pulse-border {
-            0%, 100% { stroke-opacity: 1; }
-            50% { stroke-opacity: 0.4; }
-        }
-        
-        /* Custom Scrollbars */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #090d16;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #1e293b;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #334155;
-        }
+
+/* =====================================================
+   TOGETHER-VISITANTES
+   Arquivo: css/style.css
+   Estilos do mapa e da interface
+   ===================================================== */
+
+/* =====================================================
+   1. CONFIGURAÇÕES GERAIS
+   ===================================================== */
+
+:root {
+    color-scheme: dark;
+    --arena-bg: #090d16;
+    --arena-surface: #0f172a;
+    --arena-border: #1e293b;
+    --arena-text: #e2e8f0;
+    --arena-muted: #94a3b8;
+    --arena-blue: #38bdf8;
+    --arena-cyan: #22d3ee;
+    --arena-purple: #7c3aed;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: var(--arena-bg);
+    color: var(--arena-text);
+}
+
+/* Evita imagens e mapas ultrapassarem seus contêineres. */
+img,
+svg {
+    max-width: 100%;
+}
+
+/* =====================================================
+   2. SETORES DO MAPA DA ARENA
+   ===================================================== */
+
+.map-sector {
+    cursor: pointer;
+    stroke: rgba(255, 255, 255, 0.4);
+    stroke-width: 2;
+    transition:
+        filter 0.25s ease-in-out,
+        stroke 0.25s ease-in-out,
+        stroke-width 0.25s ease-in-out;
+}
+
+/* Destaque ao passar o mouse. */
+.map-sector:hover {
+    filter: brightness(1.25);
+    stroke: var(--arena-blue);
+    stroke-width: 3;
+}
+
+/* Setor selecionado. */
+.map-sector.active {
+    filter: brightness(1.4);
+    stroke: var(--arena-cyan);
+    stroke-width: 4;
+    animation: pulse-border 1.5s ease-in-out infinite;
+}
+
+/* Realce de foco para navegação por teclado. */
+.map-sector:focus-visible {
+    outline: none;
+    stroke: var(--arena-blue);
+    stroke-width: 4;
+}
+
+/* Animação da borda do setor selecionado. */
+@keyframes pulse-border {
+    0%,
+    100% {
+        stroke-opacity: 1;
+    }
+
+    50% {
+        stroke-opacity: 0.4;
+    }
+}
+
+/* =====================================================
+   3. BARRAS DE ROLAGEM
+   ===================================================== */
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--arena-bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--arena-border);
+    border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #334155;
+}
+
+/* Firefox. */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--arena-border) var(--arena-bg);
+}
+
+/* =====================================================
+   4. FORMULÁRIOS E CONTROLES
+   ===================================================== */
+
+input,
+textarea,
+select,
+button {
+    font: inherit;
+}
+
+input,
+textarea,
+select {
+    max-width: 100%;
+}
+
+button {
+    -webkit-tap-highlight-color: transparent;
+}
+
+button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Destaque acessível ao navegar com Tab. */
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+    outline: 2px solid var(--arena-blue);
+    outline-offset: 3px;
+}
+
+/* =====================================================
+   5. RESPONSIVIDADE
+   ===================================================== */
+
+@media (max-width: 640px) {
+    .map-sector:hover {
+        stroke-width: 2;
+    }
+
+    .map-sector.active {
+        stroke-width: 3;
+    }
+
+    ::-webkit-scrollbar {
+        width: 5px;
+        height: 5px;
+    }
+}
+
+/* Respeita quem prefere menos animações. */
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

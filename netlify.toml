@@ -1,6 +1,9 @@
 
 [build]
-  publish = "."
+  publish = "public"
+
+[functions]
+  directory = "functions"
 
 [[headers]]
   for = "/*"
