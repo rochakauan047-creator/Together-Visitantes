@@ -1,17 +1,38 @@
 <!DOCTYPE html>
 <html lang="pt-BR" class="h-full bg-slate-950 text-slate-100">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Central de Ocorrências — Arena de Pernambuco</title>
+    <meta name="theme-color" content="#090d16">
 
-    <!-- Tailwind CSS -->
+    <title>Together | Central de Ocorrências</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Ícones Lucide -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- Firebase SDKs -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            950: "#090d16",
+                            900: "#0f172a"
+                        },
+                        brand: {
+                            500: "#38bdf8",
+                            600: "#0284c7",
+                            700: "#0369a1",
+                            950: "#082f49"
+                        }
+                    }
+                }
+            }
+        };
+    </script>
+
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -19,441 +40,921 @@
 
     <!-- CSS do projeto -->
     <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            background: #090d16;
+            color: #e2e8f0;
+            font-family: Arial, sans-serif;
+        }
+
+        button,
+        input,
+        textarea {
+            font: inherit;
+        }
+
+        button {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .main-container {
+            width: min(1400px, 100%);
+            margin: auto;
+            padding: 24px;
+        }
+
+        .panel {
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            border-radius: 16px;
+        }
+
+        .section-label {
+            display: block;
+            margin-bottom: 10px;
+            color: #94a3b8;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+        .nav-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 11px 15px;
+            border: 1px solid #263449;
+            border-radius: 10px;
+            background: #111c30;
+            color: #94a3b8;
+            font-size: 12px;
+            font-weight: 700;
+            transition: .2s;
+        }
+
+        .nav-button:hover,
+        .nav-button.active {
+            border-color: #0284c7;
+            background: #082f49;
+            color: #38bdf8;
+        }
+
+        .form-field {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            outline: none;
+            background: #090f1d;
+            color: #f8fafc;
+        }
+
+        .form-field:focus {
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 2px #38bdf833;
+        }
+
+        .form-field::placeholder {
+            color: #64748b;
+        }
+
+        .category-card {
+            position: relative;
+            display: flex;
+            min-height: 92px;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 8px;
+            border: 1px solid #263449;
+            border-radius: 12px;
+            background: #111c30;
+            text-align: center;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .category-card:has(input:checked) {
+            border: 2px solid #38bdf8;
+            background: #102a42;
+        }
+
+        .category-card input {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .category-card:focus-within {
+            outline: 2px solid #38bdf8;
+        }
+
+        .category-icon {
+            display: grid;
+            width: 35px;
+            height: 35px;
+            place-items: center;
+            border-radius: 9px;
+            background: #1e293b;
+        }
+
+        /* MAPA */
+
+        .arena-map-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1648 / 928;
+            overflow: hidden;
+            border: 1px solid #263449;
+            border-radius: 13px;
+            background: #0b1930;
+        }
+
+        .arena-map-overlay {
+            position: absolute;
+            inset: 0;
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .arena-map-overlay polygon {
+            cursor: pointer;
+            stroke-width: 3;
+            stroke-linejoin: round;
+            vector-effect: non-scaling-stroke;
+            fill-opacity: .15;
+            transition: fill-opacity .2s, stroke-width .2s;
+        }
+
+        .arena-map-overlay polygon:hover {
+            fill-opacity: .4;
+            stroke-width: 5;
+        }
+
+        .arena-map-overlay polygon.map-area-selected {
+            fill-opacity: .5;
+            stroke-width: 6;
+        }
+
+        .map-area-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-top: 12px;
+            color: #cbd5e1;
+            font-size: 12px;
+        }
+
+        .map-area-legend span {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .map-area-legend i {
+            width: 10px;
+            height: 10px;
+            border-radius: 3px;
+        }
+
+        .legend-red {
+            background: #e11d48;
+        }
+
+        .legend-purple {
+            background: #9333ea;
+        }
+
+        .legend-orange {
+            background: #f97316;
+        }
+
+        .floor-options {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 9px;
+        }
+
+        .floor-option {
+            min-height: 48px;
+            padding: 11px;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            background: #111c30;
+            color: #cbd5e1;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .floor-option:hover,
+        .floor-option.active {
+            border-color: #38bdf8;
+            background: #075985;
+            color: white;
+        }
+
+        .primary-button {
+            width: 100%;
+            min-height: 52px;
+            padding: 13px;
+            border-radius: 11px;
+            background: #0284c7;
+            color: white;
+            font-weight: 800;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .primary-button:hover {
+            background: #0ea5e9;
+        }
+
+        .primary-button:disabled {
+            cursor: not-allowed;
+            opacity: .6;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 12px;
+            }
+
+            .nav-button {
+                flex: 1;
+                padding: 10px 5px;
+                font-size: 11px;
+            }
+
+            .category-card {
+                min-height: 84px;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .category-card span {
+                font-size: 11px;
+            }
+
+            .map-area-legend {
+                gap: 9px;
+                font-size: 10px;
+            }
+        }
+    </style>
 </head>
 
-<body class="h-full flex flex-col font-sans bg-navy-950 text-slate-100 antialiased selection:bg-brand-500 selection:text-white">
+<body class="flex min-h-screen flex-col">
 
     <!-- CABEÇALHO -->
-    <header class="bg-navy-900/90 border-b border-slate-800 backdrop-blur-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-center h-16 sm:h-20">
+    <header class="sticky top-0 z-50 border-b border-slate-800 bg-slate-950/95 backdrop-blur">
+        <div class="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3">
 
-                <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('visitor')">
-                    <div class="p-2.5 bg-brand-600/20 border border-brand-500/30 rounded-xl text-brand-500">
-                        <i data-lucide="shield-alert" class="w-6 h-6 sm:w-7 sm:h-7"></i>
-                    </div>
+            <button onclick="switchTab('visitor')" class="flex items-center gap-3 text-left">
 
-                    <div>
-                        <span class="text-xs font-bold uppercase tracking-widest text-brand-500 bg-brand-950/80 border border-brand-800/50 px-2 py-0.5 rounded-full">
-                            Evento Together
-                        </span>
-                        <h1 class="text-lg sm:text-xl font-bold tracking-tight text-white">Central de Ocorrências</h1>
-                        <p class="text-xs text-slate-400 hidden sm:block">Arena de Pernambuco — Recife-PE</p>
-                    </div>
+                <div class="rounded-xl border border-sky-500/30 bg-sky-500/10 p-3 text-sky-400">
+                    <i data-lucide="shield-alert" class="h-7 w-7"></i>
                 </div>
 
-                <div class="flex items-center space-x-2 sm:space-x-3">
-                 
+                <div>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-sky-400">
+                        Evento Together
+                    </span>
 
-                 
+                    <h1 class="text-base font-bold text-white sm:text-xl">
+                        Central de Ocorrências
+                    </h1>
 
-                  
+                    <p class="hidden text-xs text-slate-400 sm:block">
+                        Arena de Pernambuco — Recife-PE
+                    </p>
                 </div>
-            </div>
+            </button>
+
+            <span
+                class="hidden rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1.5 text-xs font-bold text-emerald-400 sm:inline-flex">
+                Sistema de Operações
+            </span>
+
         </div>
+
+        <!-- NAVEGAÇÃO -->
+        <nav class="mx-auto flex max-w-7xl gap-2 overflow-x-auto px-4 pb-3">
+
+            <button id="navVisitor" class="nav-button active" onclick="switchTab('visitor')">
+                <i data-lucide="map-pin" class="h-4 w-4"></i>
+                Visitantes
+            </button>
+
+            <button id="navStaff" class="nav-button" onclick="switchTab('staff')">
+                <i data-lucide="wrench" class="h-4 w-4"></i>
+                Manutenção
+            </button>
+
+            <button id="navAdmin" class="nav-button" onclick="switchTab('admin')">
+                <i data-lucide="shield-check" class="h-4 w-4"></i>
+                Administrador
+            </button>
+
+        </nav>
     </header>
 
-    <!-- CONTEÚDO PRINCIPAL -->
-    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+    <main class="main-container flex-1">
 
-        <!-- ABA 1: VISITANTE -->
-        <section id="tabVisitor" class="space-y-6">
-            <div class="bg-navy-900 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl">
+        <!-- =================================================
+             VISITANTES
+        ================================================== -->
 
-                <div class="max-w-3xl mb-6">
-                    <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
-                        <i data-lucide="map-pin" class="text-brand-500"></i>
-                        Registrar Ocorrência na Arena
+        <section id="tabVisitor" class="space-y-5">
+
+            <div class="panel p-4 sm:p-6">
+
+                <div class="mb-6">
+                    <h2 class="flex items-center gap-2 text-xl font-bold text-white sm:text-2xl">
+                        <i data-lucide="map-pin" class="text-sky-400"></i>
+                        Registrar Ocorrência
                     </h2>
-                    <p class="text-sm text-slate-400 mt-1">
-                        Selecione a categoria do problema, toque no setor correspondente no mapa e descreva o que aconteceu.
+
+                    <p class="mt-2 text-sm text-slate-400">
+                        Selecione a categoria, identifique o local no mapa e descreva o problema encontrado.
                     </p>
                 </div>
 
                 <form id="visitorForm" onsubmit="submitOccurrence(event)" class="space-y-6">
 
                     <!-- CATEGORIAS -->
+
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">
-                            1. Selecione a categoria do problema
+                        <label class="section-label">
+                            1. Categoria do problema
                         </label>
 
-                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
 
-                            <label class="relative flex flex-col items-center p-3.5 bg-slate-900/80 border border-slate-800 rounded-xl cursor-pointer hover:border-brand-500/50 transition-all text-center group">
-                                <input type="radio" name="category" value="Hidráulica / Vazamento" required class="peer sr-only">
-                                <div class="p-2.5 rounded-lg bg-blue-500/10 text-blue-400 peer-checked:bg-brand-500 peer-checked:text-white">
-                                    <i data-lucide="droplets" class="w-5 h-5"></i>
+                            <label class="category-card">
+                                <input type="radio" name="category" value="Hidráulica / Vazamento" required>
+                                <div class="category-icon text-sky-400">
+                                    <i data-lucide="droplets"></i>
                                 </div>
-                                <span class="text-xs sm:text-sm font-medium mt-2 text-slate-300 peer-checked:text-white">Hidráulica / Vazamento</span>
-                                <div class="absolute inset-0 border-2 border-brand-500 rounded-xl opacity-0 peer-checked:opacity-100 pointer-events-none"></div>
+                                <span class="text-xs font-semibold">Hidráulica / Vazamento</span>
                             </label>
 
-                            <label class="relative flex flex-col items-center p-3.5 bg-slate-900/80 border border-slate-800 rounded-xl cursor-pointer hover:border-brand-500/50 transition-all text-center group">
-                                <input type="radio" name="category" value="Elétrica / Iluminação" class="peer sr-only">
-                                <div class="p-2.5 rounded-lg bg-amber-500/10 text-amber-400 peer-checked:bg-brand-500 peer-checked:text-white">
-                                    <i data-lucide="zap" class="w-5 h-5"></i>
+                            <label class="category-card">
+                                <input type="radio" name="category" value="Elétrica / Iluminação">
+                                <div class="category-icon text-amber-400">
+                                    <i data-lucide="zap"></i>
                                 </div>
-                                <span class="text-xs sm:text-sm font-medium mt-2 text-slate-300 peer-checked:text-white">Elétrica / Iluminação</span>
-                                <div class="absolute inset-0 border-2 border-brand-500 rounded-xl opacity-0 peer-checked:opacity-100 pointer-events-none"></div>
+                                <span class="text-xs font-semibold">Elétrica / Iluminação</span>
                             </label>
 
-                            <label class="relative flex flex-col items-center p-3.5 bg-slate-900/80 border border-slate-800 rounded-xl cursor-pointer hover:border-brand-500/50 transition-all text-center group">
-                                <input type="radio" name="category" value="Limpeza / Sanitários" class="peer sr-only">
-                                <div class="p-2.5 rounded-lg bg-emerald-500/10 text-emerald-400 peer-checked:bg-brand-500 peer-checked:text-white">
-                                    <i data-lucide="sparkles" class="w-5 h-5"></i>
+                            <label class="category-card">
+                                <input type="radio" name="category" value="Limpeza / Sanitários">
+                                <div class="category-icon text-emerald-400">
+                                    <i data-lucide="sparkles"></i>
                                 </div>
-                                <span class="text-xs sm:text-sm font-medium mt-2 text-slate-300 peer-checked:text-white">Limpeza / Banheiros</span>
-                                <div class="absolute inset-0 border-2 border-brand-500 rounded-xl opacity-0 peer-checked:opacity-100 pointer-events-none"></div>
+                                <span class="text-xs font-semibold">Limpeza / Banheiros</span>
                             </label>
 
-                            <label class="relative flex flex-col items-center p-3.5 bg-slate-900/80 border border-slate-800 rounded-xl cursor-pointer hover:border-brand-500/50 transition-all text-center group">
-                                <input type="radio" name="category" value="Estrutura / Mobiliário" class="peer sr-only">
-                                <div class="p-2.5 rounded-lg bg-purple-500/10 text-purple-400 peer-checked:bg-brand-500 peer-checked:text-white">
-                                    <i data-lucide="hammer" class="w-5 h-5"></i>
+                            <label class="category-card">
+                                <input type="radio" name="category" value="Estrutura / Mobiliário">
+                                <div class="category-icon text-purple-400">
+                                    <i data-lucide="hammer"></i>
                                 </div>
-                                <span class="text-xs sm:text-sm font-medium mt-2 text-slate-300 peer-checked:text-white">Estrutura / Assentos</span>
-                                <div class="absolute inset-0 border-2 border-brand-500 rounded-xl opacity-0 peer-checked:opacity-100 pointer-events-none"></div>
+                                <span class="text-xs font-semibold">Estrutura / Assentos</span>
                             </label>
 
-                            <label class="relative flex flex-col items-center p-3.5 bg-slate-900/80 border border-slate-800 rounded-xl cursor-pointer hover:border-brand-500/50 transition-all text-center group">
-                                <input type="radio" name="category" value="Acesso / Sinalização" class="peer sr-only">
-                                <div class="p-2.5 rounded-lg bg-rose-500/10 text-rose-400 peer-checked:bg-brand-500 peer-checked:text-white">
-                                    <i data-lucide="signpost" class="w-5 h-5"></i>
+                            <label class="category-card">
+                                <input type="radio" name="category" value="Acesso / Sinalização">
+                                <div class="category-icon text-rose-400">
+                                    <i data-lucide="signpost"></i>
                                 </div>
-                                <span class="text-xs sm:text-sm font-medium mt-2 text-slate-300 peer-checked:text-white">Acesso / Sinalização</span>
-                                <div class="absolute inset-0 border-2 border-brand-500 rounded-xl opacity-0 peer-checked:opacity-100 pointer-events-none"></div>
+                                <span class="text-xs font-semibold">Acesso / Sinalização</span>
                             </label>
 
-                            <label class="relative flex flex-col items-center p-3.5 bg-slate-900/80 border border-slate-800 rounded-xl cursor-pointer hover:border-brand-500/50 transition-all text-center group">
-                                <input type="radio" name="category" value="Outros" class="peer sr-only">
-                                <div class="p-2.5 rounded-lg bg-slate-500/10 text-slate-400 peer-checked:bg-brand-500 peer-checked:text-white">
-                                    <i data-lucide="more-horizontal" class="w-5 h-5"></i>
+                            <label class="category-card">
+                                <input type="radio" name="category" value="Outros">
+                                <div class="category-icon text-slate-400">
+                                    <i data-lucide="more-horizontal"></i>
                                 </div>
-                                <span class="text-xs sm:text-sm font-medium mt-2 text-slate-300 peer-checked:text-white">Outros</span>
-                                <div class="absolute inset-0 border-2 border-brand-500 rounded-xl opacity-0 peer-checked:opacity-100 pointer-events-none"></div>
+                                <span class="text-xs font-semibold">Outros</span>
                             </label>
 
                         </div>
                     </div>
 
-                    <!-- MAPA E LOCALIZAÇÃO -->
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                    <!-- MAPA E LOCAL -->
 
-                        <div class="lg:col-span-7 bg-slate-900/90 border border-slate-800 rounded-xl p-3 sm:p-4 overflow-hidden shadow-inner">
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">2. Toque no setor do ocorrido</span>
-                                <span id="selectedSectorBadge" class="text-xs font-bold text-brand-400 bg-brand-950 px-2.5 py-1 rounded-full border border-brand-800">
+                    <div class="grid grid-cols-1 items-start gap-5 lg:grid-cols-12">
+
+                        <div class="panel min-w-0 p-3 sm:p-4 lg:col-span-7">
+
+                            <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+                                <label class="section-label mb-0">
+                                    2. Selecione a zona
+                                </label>
+
+                                <span id="selectedSectorBadge"
+                                    class="rounded-full border border-slate-700 bg-slate-950 px-3 py-1 text-xs font-bold text-sky-400">
                                     Nenhum setor selecionado
                                 </span>
                             </div>
 
-                            <div class="relative w-full aspect-[3/4] max-h-[500px] mx-auto flex items-center justify-center">
-                                <svg viewBox="0 0 800 1100" class="w-full h-full select-none" id="arenaMapSvg">
-                                    <rect width="800" height="1100" fill="#080e18" rx="20"/>
-                                    <path d="M 300,0 C 250,200 400,300 280,500 C 160,700 750,550 780,1100" fill="none" stroke="#1e3a8a" stroke-width="35" opacity="0.3"/>
+                            <!--
+                              MAPA ESQUEMÁTICO
+                              As coordenadas das zonas devem corresponder
+                              aos contornos reais da planta da Arena.
+                            -->
 
-                                    <!-- Estacionamento P1 -->
-                                    <g id="sector-P1" class="map-sector" onclick="selectSector('P1', 'Estacionamento P1 (Norte/Oeste)')">
-                                        <polygon points="50,70 280,70 200,320 80,260" fill="#2563eb" fill-opacity="0.6"/>
-                                        <text x="160" y="180" fill="#fff" font-size="28" font-weight="bold" text-anchor="middle">P1</text>
-                                    </g>
+                            <div class="arena-map-container">
 
-                                    <!-- Estacionamento P2 -->
-                                    <g id="sector-P2" class="map-sector" onclick="selectSector('P2', 'Estacionamento P2 (Norte/Leste)')">
-                                        <polygon points="400,130 600,130 610,320 420,280" fill="#2563eb" fill-opacity="0.6"/>
-                                        <text x="510" y="220" fill="#fff" font-size="28" font-weight="bold" text-anchor="middle">P2</text>
-                                    </g>
+<svg
+    id="arenaMapSvg"
+    class="arena-map-overlay"
+    viewBox="0 0 512 512"
+    preserveAspectRatio="xMidYMid meet"
+    role="group"
+    aria-label="Mapa esquemático da Arena">
 
-                                    <!-- Áreas externas -->
-                                    <g id="sector-X1-Top" class="map-sector" onclick="selectSector('X1', 'Áreas Externas / Praça de Convivência')">
-                                        <path d="M 330,80 L 390,80 L 380,240 L 320,200 Z" fill="#7c3aed" fill-opacity="0.6"/>
-                                        <text x="355" y="150" fill="#fff" font-size="18" font-weight="bold" text-anchor="middle">X1</text>
-                                    </g>
+    <!-- Fundo -->
+    <rect width="512" height="512" fill="#020717"/>
 
-                                    <g id="sector-X1-Left" class="map-sector" onclick="selectSector('X1', 'Áreas Externas / Entorno Oeste')">
-                                        <path d="M 170,440 L 220,440 L 220,680 L 160,680 Z" fill="#7c3aed" fill-opacity="0.6"/>
-                                        <text x="190" y="560" fill="#fff" font-size="20" font-weight="bold" text-anchor="middle">X1</text>
-                                    </g>
+    <!-- Contorno externo do estádio -->
+    <rect x="67" y="33" width="345" height="457"
+          rx="72" fill="none"
+          stroke="white" stroke-width="3"/>
 
-                                    <g id="sector-X1-Right" class="map-sector" onclick="selectSector('X1', 'Áreas Externas / Entorno Leste')">
-                                        <path d="M 580,440 L 640,440 L 630,680 L 590,680 Z" fill="#7c3aed" fill-opacity="0.6"/>
-                                        <text x="610" y="560" fill="#fff" font-size="20" font-weight="bold" text-anchor="middle">X1</text>
-                                    </g>
+    <!-- Área interna de referência -->
+    <rect x="100" y="84" width="273" height="370"
+          rx="6" fill="none"
+          stroke="white" stroke-width="3"/>
 
-                                    <!-- Campo central -->
-                                    <rect x="330" y="530" width="140" height="90" fill="#15803d" stroke="#22c55e" stroke-width="3" rx="4"/>
-                                    <line x1="400" y1="530" x2="400" y2="620" stroke="#fff" stroke-width="2" opacity="0.6"/>
-                                    <circle cx="400" cy="575" r="18" fill="none" stroke="#fff" stroke-width="2" opacity="0.6"/>
+    <!-- Campo de futebol -->
+    <g fill="none" stroke="white" stroke-width="8">
+        <path d="M153 150 H321 V390 H153 Z"/>
+        <path d="M153 269 H321"/>
+        <circle cx="237" cy="269" r="30"/>
 
-                                    <!-- Arquibancada A1 -->
-                                    <g id="sector-A1" class="map-sector" onclick="selectSector('A1', 'Arquibancada A1 (Norte)')">
-                                        <path d="M 270,430 C 340,390 460,390 530,430 L 510,510 C 440,480 360,480 290,510 Z" fill="#0284c7" fill-opacity="0.8"/>
-                                        <text x="400" y="465" fill="#fff" font-size="24" font-weight="bold" text-anchor="middle">A1</text>
-                                    </g>
+        <!-- Área superior -->
+        <path d="M190 150 V180 Q190 193 203 193 H273 Q286 193 286 180 V150"/>
+        <path d="M211 193 Q237 225 263 193"/>
 
-                                    <!-- Arquibancada A2 -->
-                                    <g id="sector-A2" class="map-sector" onclick="selectSector('A2', 'Arquibancada A2 (Leste)')">
-                                        <path d="M 535,435 C 580,510 580,640 535,715 L 485,670 C 510,620 510,530 485,480 Z" fill="#0d9488" fill-opacity="0.8"/>
-                                        <text x="525" y="580" fill="#fff" font-size="24" font-weight="bold" text-anchor="middle">A2</text>
-                                    </g>
+        <!-- Área inferior -->
+        <path d="M190 390 V359 Q190 347 203 347 H273 Q286 347 286 359 V390"/>
+        <path d="M211 347 Q237 315 263 347"/>
+    </g>
 
-                                    <!-- Arquibancada A3 -->
-                                    <g id="sector-A3" class="map-sector" onclick="selectSector('A3', 'Arquibancada A3 (Sul)')">
-                                        <path d="M 270,720 C 340,760 460,760 530,720 L 510,640 C 440,670 360,670 290,640 Z" fill="#d97706" fill-opacity="0.8"/>
-                                        <text x="400" y="695" fill="#fff" font-size="24" font-weight="bold" text-anchor="middle">A3</text>
-                                    </g>
+    <!-- ÁREA VERMELHA -->
+    <path
+        data-map-area="vermelho"
+        tabindex="0"
+        role="button"
+        aria-label="Selecionar área vermelha"
+        aria-pressed="false"
+        onclick="selectMapArea('vermelho')"
+        d="M68 134 L136 86 L136 452 L68 404 Z"
+        fill="#e11d48"
+        fill-opacity=".12"
+        stroke="#ff3038"
+        stroke-width="6"
+        stroke-linejoin="round"
+    />
 
-                                    <!-- Arquibancada A4 -->
-                                    <g id="sector-A4" class="map-sector" onclick="selectSector('A4', 'Arquibancada A4 (Oeste)')">
-                                        <path d="M 265,435 C 220,510 220,640 265,715 L 315,670 C 290,620 290,530 315,480 Z" fill="#7c3aed" fill-opacity="0.8"/>
-                                        <text x="275" y="580" fill="#fff" font-size="24" font-weight="bold" text-anchor="middle">A4</text>
-                                    </g>
+    <!-- ÁREA LARANJA -->
+    <path
+        data-map-area="laranja"
+        tabindex="0"
+        role="button"
+        aria-label="Selecionar área laranja"
+        aria-pressed="false"
+        onclick="selectMapArea('laranja')"
+        d="M153 143 L207 86 L267 86 L321 143 L321 397 L267 452 L207 452 L153 397 Z"
+        fill="#f97316"
+        fill-opacity=".10"
+        stroke="#ff8a00"
+        stroke-width="8"
+        stroke-linejoin="round"
+    />
 
-                                    <!-- Acesso E1 -->
-                                    <g id="sector-E1" class="map-sector" onclick="selectSector('E1', 'Acesso Principal E1 (Sul)')">
-                                        <polygon points="360,780 440,780 450,830 350,830" fill="#e11d48" fill-opacity="0.85"/>
-                                        <text x="400" y="812" fill="#fff" font-size="22" font-weight="bold" text-anchor="middle">E1</text>
-                                    </g>
+    <!-- ÁREA ROXA -->
+    <path
+        data-map-area="roxo"
+        tabindex="0"
+        role="button"
+        aria-label="Selecionar área roxa"
+        aria-pressed="false"
+        onclick="selectMapArea('roxo')"
+        d="M336 86 L410 134 L410 404 L336 452 Z"
+        fill="#9333ea"
+        fill-opacity=".12"
+        stroke="#a855f7"
+        stroke-width="6"
+        stroke-linejoin="round"
+    />
 
-                                    <!-- Estacionamento P3 -->
-                                    <g id="sector-P3-Left" class="map-sector" onclick="selectSector('P3', 'Estacionamento P3 (Sul/Oeste)')">
-                                        <path d="M 180,740 L 330,780 L 320,930 L 180,900 Z" fill="#2563eb" fill-opacity="0.6"/>
-                                        <text x="250" y="850" fill="#fff" font-size="26" font-weight="bold" text-anchor="middle">P3</text>
-                                    </g>
+</svg>
 
-                                    <g id="sector-P3-Right" class="map-sector" onclick="selectSector('P3', 'Estacionamento P3 (Sul/Leste)')">
-                                        <path d="M 470,780 L 620,740 L 620,900 L 480,930 Z" fill="#2563eb" fill-opacity="0.6"/>
-                                        <text x="550" y="850" fill="#fff" font-size="26" font-weight="bold" text-anchor="middle">P3</text>
-                                    </g>
-
-                                    <!-- Legenda -->
-                                    <g transform="translate(560, 30)">
-                                        <rect width="210" height="150" fill="#0f172a" fill-opacity="0.9" rx="8" stroke="#334155"/>
-                                        <text x="15" y="25" fill="#f8fafc" font-size="12" font-weight="bold">LEGENDA DO MAPA</text>
-                                        <rect x="15" y="40" width="12" height="12" fill="#0284c7" rx="2"/>
-                                        <text x="35" y="51" fill="#cbd5e1" font-size="11">A = Arquibancadas</text>
-                                        <rect x="15" y="62" width="12" height="12" fill="#2563eb" rx="2"/>
-                                        <text x="35" y="73" fill="#cbd5e1" font-size="11">P = Estacionamentos</text>
-                                        <rect x="15" y="84" width="12" height="12" fill="#e11d48" rx="2"/>
-                                        <text x="35" y="95" fill="#cbd5e1" font-size="11">E = Acessos Principais</text>
-                                        <rect x="15" y="106" width="12" height="12" fill="#7c3aed" rx="2"/>
-                                        <text x="35" y="117" fill="#cbd5e1" font-size="11">X = Áreas Externas</text>
-                                    </g>
-                                </svg>
                             </div>
+
+                            <div class="map-area-legend">
+                                <span><i class="legend-red"></i> Área vermelha</span>
+                                <span><i class="legend-orange"></i> Área laranja</span>
+                                <span><i class="legend-purple"></i> Área roxa</span>
+                            </div>
+
+                            <!-- PAVIMENTOS -->
+
+                            <div class="mt-5 border-t border-slate-800 pt-4">
+
+                                <h3 id="mapFloorTitle" class="mb-3 text-sm font-bold text-white">
+                                    3. Escolha uma zona primeiro
+                                </h3>
+
+                                <div id="mapFloorOptions" class="floor-options hidden">
+                                </div>
+
+                            </div>
+
                         </div>
 
-                        <!-- DETALHES DO LOCAL -->
-                        <div class="lg:col-span-5 space-y-4">
+                        <!-- FORMULÁRIO -->
+
+                        <div class="min-w-0 space-y-5 lg:col-span-5">
+
                             <div>
-                                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
-                                    3. Local confirmado / detalhado
+                                <label for="locationInput" class="section-label">
+                                    4. Local selecionado
                                 </label>
-                                <input type="text" id="locationInput" name="location" required readonly placeholder="Toque no mapa acima para escolher" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 font-medium focus:outline-none focus:ring-2 focus:ring-brand-500">
-                                <p class="text-xs text-slate-500 mt-1">
-                                    Exemplo: Arquibancada A1, próximo ao Bloco B, ou banheiro masculino P2.
+
+                                <input type="text" id="locationInput" name="location" required readonly
+                                    placeholder="Selecione a zona e o pavimento" class="form-field">
+
+                                <p class="mt-2 text-xs text-slate-500">
+                                    Confira se a localização selecionada corresponde ao local do problema.
                                 </p>
                             </div>
 
                             <div>
-                                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
-                                    4. Descrição da ocorrência
+                                <label for="descriptionInput" class="section-label">
+                                    5. Descrição da ocorrência
                                 </label>
-                                <textarea id="descriptionInput" name="description" rows="4" required maxlength="1500" placeholder="Descreva o problema encontrado..." class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm"></textarea>
+
+                                <textarea id="descriptionInput" name="description" rows="7" maxlength="1500" required
+                                    placeholder="Descreva o problema encontrado..."
+                                    class="form-field resize-y"></textarea>
+
+                                <p class="mt-2 text-right text-xs text-slate-500">
+                                    Até 1500 caracteres
+                                </p>
                             </div>
 
-                            <button type="submit" id="submitBtn" class="w-full py-4 px-6 bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-500 hover:to-brand-400 text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center space-x-2 text-base">
-                                <i data-lucide="send" class="w-5 h-5"></i>
-                                <span>Registrar Ocorrência Agora</span>
+                            <button type="submit" id="submitBtn" class="primary-button">
+
+                                <span class="inline-flex items-center justify-center gap-2">
+                                    <i data-lucide="send" class="h-4 w-4"></i>
+                                    Registrar ocorrência
+                                </span>
+
                             </button>
+
+                            <p class="text-center text-xs text-slate-500">
+                                A ocorrência será encaminhada à equipe responsável.
+                            </p>
+
                         </div>
+
                     </div>
+
                 </form>
             </div>
         </section>
 
-        <!-- ABA 2: MANUTENÇÃO -->
+        <!-- =================================================
+             MANUTENÇÃO
+        ================================================== -->
+
         <section id="tabStaff" class="hidden space-y-6">
 
-            <div id="staffAuthBox" class="max-w-md mx-auto bg-navy-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl">
-                <div class="text-center mb-6">
-                    <div class="inline-flex p-3 bg-brand-500/10 border border-brand-500/30 rounded-2xl text-brand-400 mb-3">
-                        <i data-lucide="wrench" class="w-8 h-8"></i>
+            <div id="staffAuthBox" class="panel mx-auto max-w-md p-6 sm:p-8">
+
+                <div class="mb-6 text-center">
+                    <div class="mb-3 inline-flex rounded-xl border border-sky-500/30 bg-sky-500/10 p-3 text-sky-400">
+                        <i data-lucide="wrench" class="h-8 w-8"></i>
                     </div>
-                    <h2 class="text-2xl font-bold text-white">Acesso da Manutenção</h2>
-                    <p class="text-xs text-slate-400 mt-1">
-                        Informe seu nome e o código de acesso fornecido pela organização.
+
+                    <h2 class="text-2xl font-bold text-white">
+                        Acesso da Manutenção
+                    </h2>
+
+                    <p class="mt-2 text-sm text-slate-400">
+                        Entre com seu nome e código de acesso.
                     </p>
                 </div>
 
                 <form onsubmit="handleStaffLogin(event)" class="space-y-4">
+
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Seu nome / identificação</label>
-                        <input type="text" id="staffNameInput" maxlength="80" required placeholder="Ex.: Carlos Silva" class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <label class="section-label" for="staffNameInput">
+                            Nome do funcionário
+                        </label>
+
+                        <input id="staffNameInput" type="text" maxlength="80" required placeholder="Seu nome"
+                            class="form-field">
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Código de acesso (6 caracteres)</label>
-                        <input type="text" id="staffCodeInput" minlength="6" maxlength="6" pattern="[A-Za-z0-9]{6}" required autocomplete="one-time-code" placeholder="Ex.: A8K9X2" class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white font-mono uppercase tracking-widest text-center text-lg focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <label class="section-label" for="staffCodeInput">
+                            Código de acesso
+                        </label>
+
+                        <input id="staffCodeInput" type="text" minlength="6" maxlength="6" pattern="[A-Za-z0-9]{6}"
+                            autocomplete="one-time-code" required placeholder="ABC123"
+                            class="form-field text-center font-mono text-xl uppercase tracking-widest">
                     </div>
 
-                    <button type="submit" class="w-full py-3.5 bg-brand-600 hover:bg-brand-500 text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center space-x-2">
-                        <i data-lucide="log-in" class="w-5 h-5"></i>
-                        <span>Acessar Painel de Operações</span>
+                    <button type="submit" class="primary-button">
+                        Acessar painel
                     </button>
+
                 </form>
             </div>
 
-            <!-- PAINEL DA EQUIPE -->
-            <div id="staffDashboard" class="hidden space-y-6">
-                <div class="bg-navy-900 border border-slate-800 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-10 h-10 rounded-full bg-brand-600/20 border border-brand-500/40 flex items-center justify-center text-brand-400 font-bold">
-                            <span id="staffAvatar">M</span>
-                        </div>
-                        <div>
-                            <span class="text-xs text-slate-400 uppercase font-bold tracking-wider">Técnico em atendimento</span>
-                            <h3 id="staffDisplayName" class="text-lg font-bold text-white">Carregando...</h3>
-                        </div>
+            <div id="staffDashboard" class="hidden space-y-5">
+
+                <div class="panel flex flex-col justify-between gap-3 p-4 sm:flex-row sm:items-center">
+
+                    <div>
+                        <span class="text-xs font-bold uppercase text-sky-400">
+                            Equipe de manutenção
+                        </span>
+
+                        <h2 id="staffDisplayName" class="mt-1 text-lg font-bold text-white">
+                            Funcionário
+                        </h2>
                     </div>
 
-                    <button onclick="logoutStaff()" class="px-4 py-2 text-xs font-semibold text-rose-400 hover:text-rose-300 bg-rose-500/10 border border-rose-500/30 rounded-lg transition-all flex items-center space-x-1.5">
-                        <i data-lucide="log-out" class="w-4 h-4"></i>
-                        <span>Encerrar sessão</span>
+                    <button onclick="logoutStaff()"
+                        class="rounded-lg border border-rose-500/30 bg-rose-500/10 px-4 py-2 text-xs font-bold text-rose-400">
+                        <i data-lucide="log-out" class="mr-1 inline h-4 w-4"></i>
+                        Sair
                     </button>
+
+                    <span id="staffAvatar" class="hidden"></span>
+
                 </div>
 
                 <!-- CONTADORES -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div class="bg-navy-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between">
-                        <div>
-                            <p class="text-xs font-semibold uppercase tracking-wider text-amber-400">Em aberto</p>
-                            <p id="countOpen" class="text-3xl font-extrabold text-white mt-1">0</p>
-                        </div>
-                        <i data-lucide="clock" class="w-6 h-6 text-amber-400"></i>
+
+                <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+
+                    <div class="panel p-5">
+                        <p class="text-xs font-bold uppercase text-amber-400">
+                            Em aberto
+                        </p>
+                        <p id="countOpen" class="mt-2 text-3xl font-extrabold text-white">0</p>
                     </div>
 
-                    <div class="bg-navy-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between">
-                        <div>
-                            <p class="text-xs font-semibold uppercase tracking-wider text-blue-400">Em atendimento</p>
-                            <p id="countProgress" class="text-3xl font-extrabold text-white mt-1">0</p>
-                        </div>
-                        <i data-lucide="loader" class="w-6 h-6 text-blue-400"></i>
+                    <div class="panel p-5">
+                        <p class="text-xs font-bold uppercase text-sky-400">
+                            Em andamento
+                        </p>
+                        <p id="countProgress" class="mt-2 text-3xl font-extrabold text-white">0</p>
                     </div>
 
-                    <div class="bg-navy-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between">
-                        <div>
-                            <p class="text-xs font-semibold uppercase tracking-wider text-emerald-400">Finalizadas</p>
-                            <p id="countDone" class="text-3xl font-extrabold text-white mt-1">0</p>
-                        </div>
-                        <i data-lucide="check-circle-2" class="w-6 h-6 text-emerald-400"></i>
+                    <div class="panel p-5">
+                        <p class="text-xs font-bold uppercase text-emerald-400">
+                            Concluídas
+                        </p>
+                        <p id="countDone" class="mt-2 text-3xl font-extrabold text-white">0</p>
                     </div>
+
                 </div>
 
-                <!-- LISTA DE OCORRÊNCIAS -->
-                <div class="bg-navy-900 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl space-y-4">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
-                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                            <i data-lucide="list-filter" class="text-brand-500"></i>
-                            Fila de Ocorrências da Arena
-                        </h3>
+                <!-- FILTROS -->
 
-                        <div class="flex flex-wrap items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
-                            <button onclick="filterStaffList('all')" id="filterBtnAll" class="px-3 py-1.5 rounded-lg font-medium text-white bg-brand-600">Todas</button>
-                            <button onclick="filterStaffList('open')" id="filterBtnOpen" class="px-3 py-1.5 rounded-lg font-medium text-slate-400">Abertas</button>
-                            <button onclick="filterStaffList('progress')" id="filterBtnProgress" class="px-3 py-1.5 rounded-lg font-medium text-slate-400">Em atendimento</button>
-                            <button onclick="filterStaffList('done')" id="filterBtnDone" class="px-3 py-1.5 rounded-lg font-medium text-slate-400">Finalizadas</button>
-                        </div>
+                <div class="panel p-4 sm:p-6">
+
+                    <div class="mb-5">
+                        <h3 class="text-lg font-bold text-white">
+                            Fila de ocorrências
+                        </h3>
+                        <p class="mt-1 text-xs text-slate-400">
+                            Acompanhe e atualize os chamados recebidos.
+                        </p>
                     </div>
 
-                    <div id="staffOccurrencesList" class="space-y-3 min-h-[250px]">
-                        <div class="text-center py-12 text-slate-500 text-sm">
-                            <i data-lucide="inbox" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
+                    <div class="mb-5 flex flex-wrap gap-2">
+
+                        <button id="filterBtnAll" onclick="filterStaffList('all')"
+                            class="rounded-lg bg-sky-600 px-3 py-2 text-xs font-bold text-white">
+                            Todas
+                        </button>
+
+                        <button id="filterBtnOpen" onclick="filterStaffList('open')"
+                            class="rounded-lg px-3 py-2 text-xs font-bold text-slate-400">
+                            Abertas
+                        </button>
+
+                        <button id="filterBtnProgress" onclick="filterStaffList('progress')"
+                            class="rounded-lg px-3 py-2 text-xs font-bold text-slate-400">
+                            Em andamento
+                        </button>
+
+                        <button id="filterBtnDone" onclick="filterStaffList('done')"
+                            class="rounded-lg px-3 py-2 text-xs font-bold text-slate-400">
+                            Concluídas
+                        </button>
+
+                    </div>
+
+                    <div id="staffOccurrencesList" class="min-h-[250px] space-y-3">
+
+                        <div class="py-10 text-center text-sm text-slate-500">
                             As ocorrências aparecerão aqui.
                         </div>
+
                     </div>
+
                 </div>
             </div>
         </section>
 
-        <!-- ABA 3: ADMINISTRADOR -->
-        <section id="tabAdmin" class="hidden space-y-6">
-            <div class="max-w-2xl mx-auto bg-navy-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl">
+        <!-- =================================================
+             ADMINISTRADOR
+        ================================================== -->
 
-                <!-- LOGIN ADMINISTRATIVO -->
-                <div id="adminAuthBox" class="text-center space-y-4">
-                    <div class="inline-flex p-3 bg-purple-500/10 border border-purple-500/30 rounded-2xl text-purple-400">
-                        <i data-lucide="shield-check" class="w-8 h-8"></i>
+        <section id="tabAdmin" class="hidden">
+
+            <div class="panel mx-auto max-w-2xl p-6 sm:p-8">
+
+                <!-- AUTENTICAÇÃO -->
+
+                <div id="adminAuthBox" class="space-y-5 text-center">
+
+                    <div
+                        class="inline-flex rounded-xl border border-purple-500/30 bg-purple-500/10 p-3 text-purple-400">
+                        <i data-lucide="shield-check" class="h-8 w-8"></i>
                     </div>
 
-                    <h2 class="text-2xl font-bold text-white">Painel do Administrador</h2>
-                    <p class="text-xs text-slate-400 max-w-md mx-auto">
-                        Acesso restrito ao administrador autorizado para geração de códigos temporários da equipe.
+                    <h2 class="text-2xl font-bold text-white">
+                        Painel administrativo
+                    </h2>
+
+                    <p class="text-sm text-slate-400">
+                        Área restrita ao administrador autorizado.
                     </p>
 
-                    <button onclick="loginAdminGoogle()" class="px-6 py-3.5 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-xl border border-slate-700 transition-all flex items-center justify-center space-x-3 mx-auto shadow-lg">
-                        <svg class="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
-                            <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.2 9 5 12 5z"/>
-                            <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.7-.2-2.3H12v4.6h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"/>
-                            <path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 10.8 0 12s.7 2.3 1.9 4.7l3.7-1.9z"/>
-                            <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.2-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z"/>
-                        </svg>
-                        <span>Entrar com Google</span>
+                    <button onclick="loginAdminGoogle()"
+                        class="mx-auto flex items-center justify-center gap-3 rounded-xl border border-slate-700 bg-slate-800 px-6 py-3 font-bold text-white hover:bg-slate-700">
+
+                        <i data-lucide="mail" class="h-5 w-5"></i>
+                        Entrar com Google
+
                     </button>
+
                 </div>
 
                 <!-- PAINEL ADMINISTRATIVO -->
+
                 <div id="adminPanel" class="hidden space-y-6">
-                    <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+
+                    <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
+
                         <div>
-                            <span class="text-xs font-bold uppercase tracking-wider text-purple-400">Sessão administrativa</span>
-                            <h3 id="adminEmail" class="text-sm font-semibold text-white">Administrador autorizado</h3>
+                            <span class="text-xs font-bold uppercase text-purple-400">
+                                Administrador conectado
+                            </span>
+
+                            <p id="adminEmail" class="mt-1 text-sm font-semibold text-white">
+                                Administrador
+                            </p>
                         </div>
-                        <button onclick="logoutAdmin()" class="text-xs text-slate-400 hover:text-white underline">Sair</button>
+
+                        <button onclick="logoutAdmin()" class="text-xs font-bold text-rose-400 hover:text-rose-300">
+                            Encerrar sessão
+                        </button>
+
                     </div>
 
                     <div class="space-y-4">
-                        <h4 class="text-base font-bold text-white flex items-center gap-2">
-                            <i data-lucide="key" class="text-brand-500"></i>
-                            Gerar código temporário para técnico
-                        </h4>
 
-                        <p class="text-xs text-slate-400">
-                            O código será válido por 24 horas. Compartilhe-o somente com a equipe autorizada.
-                        </p>
+                        <div>
+                            <h3 class="flex items-center gap-2 text-lg font-bold text-white">
+                                <i data-lucide="key" class="text-sky-400"></i>
+                                Códigos de acesso
+                            </h3>
 
-                        <button onclick="generateAccessCode()" class="w-full py-3.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center space-x-2">
-                            <i data-lucide="sparkles" class="w-5 h-5"></i>
-                            <span>Gerar novo código de 6 caracteres</span>
+                            <p class="mt-2 text-sm text-slate-400">
+                                Gere códigos temporários para a equipe de manutenção.
+                            </p>
+                        </div>
+
+                        <button onclick="generateAccessCode()"
+                            class="flex min-h-[52px] w-full items-center justify-center gap-2 rounded-xl bg-purple-600 px-4 py-3 font-bold text-white hover:bg-purple-500">
+
+                            <i data-lucide="plus-circle" class="h-5 w-5"></i>
+                            Gerar código de acesso
+
                         </button>
 
-                        <div id="generatedCodeBox" class="hidden bg-slate-950 border border-purple-500/40 rounded-xl p-4 text-center space-y-2">
-                            <span class="text-xs uppercase text-slate-400 font-semibold">Código gerado</span>
+                        <div id="generatedCodeBox"
+                            class="hidden rounded-xl border border-purple-500/30 bg-slate-950 p-5 text-center">
 
-                            <div class="flex items-center justify-center space-x-3">
-                                <span id="codeDisplay" class="text-3xl font-mono font-extrabold text-brand-400 tracking-widest">------</span>
-                                <button onclick="copyGeneratedCode()" class="p-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg border border-slate-700" title="Copiar código">
-                                    <i data-lucide="copy" class="w-5 h-5"></i>
+                            <span class="text-xs font-bold uppercase text-slate-400">
+                                Código gerado
+                            </span>
+
+                            <div class="mt-3 flex items-center justify-center gap-4">
+
+                                <span id="codeDisplay"
+                                    class="font-mono text-3xl font-extrabold tracking-widest text-sky-400">
+                                    ------
+                                </span>
+
+                                <button onclick="copyGeneratedCode()"
+                                    class="rounded-lg border border-slate-700 bg-slate-800 p-3 text-white hover:bg-slate-700"
+                                    aria-label="Copiar código">
+                                    <i data-lucide="copy" class="h-5 w-5"></i>
                                 </button>
+
                             </div>
 
-                            <p class="text-[11px] text-amber-400">Expira em 24 horas.</p>
+                            <p class="mt-3 text-xs text-amber-400">
+                                Validade de 24 horas.
+                            </p>
+
                         </div>
+
                     </div>
+
                 </div>
             </div>
         </section>
+
     </main>
 
     <!-- RODAPÉ -->
-    <footer class="bg-navy-900 border-t border-slate-800 py-4 px-6 text-center text-xs text-slate-500 mt-auto">
-        <p>© 2026 Arena de Pernambuco — Evento Together. Central de Operações de Manutenção.</p>
+
+    <footer class="mt-auto border-t border-slate-800 bg-slate-950 px-4 py-5 text-center text-xs text-slate-500">
+        Together — Arena de Pernambuco · Central de Ocorrências
     </footer>
 
-    <!-- JAVASCRIPT DO PROJETO -->
+    <!-- SCRIPTS DO PROJETO -->
     <script src="js/firebase-config.js"></script>
     <script src="js/map.js"></script>
     <script src="js/app.js"></script>
+
+    <!-- AJUSTES VISUAIS DA NAVEGAÇÃO -->
+    <script>
+        const navigationButtons = {
+            visitor: "navVisitor",
+            staff: "navStaff",
+            admin: "navAdmin"
+        };
+
+        const originalSwitchTab = window.switchTab;
+
+        // O app.js declara switchTab como função global.
+        document.addEventListener("DOMContentLoaded", () => {
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+
+            document.querySelectorAll(".nav-button").forEach(button => {
+                button.addEventListener("click", () => {
+                    document.querySelectorAll(".nav-button").forEach(item => {
+                        item.classList.remove("active");
+                    });
+
+                    button.classList.add("active");
+                });
+            });
+
+            document.querySelectorAll("[data-map-area]").forEach(polygon => {
+                polygon.addEventListener("keydown", event => {
+                    if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        polygon.click();
+                    }
+                });
+            });
+        });
+    </script>
+
 </body>
+
 </html>

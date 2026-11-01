@@ -256,8 +256,10 @@ async function submitOccurrence(event) {
             form.reset();
         }
 
-        selectedSectorCode = '';
-        selectedSectorName = '';
+resetMapSelection();
+
+selectedSectorCode = '';
+selectedSectorName = '';
 
         setText('selectedSectorBadge', 'Nenhum setor selecionado');
 

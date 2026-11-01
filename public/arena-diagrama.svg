@@ -1,0 +1,116 @@
+
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 1000 700"
+     fill="none">
+
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#101e38"/>
+      <stop offset="100%" stop-color="#071225"/>
+    </linearGradient>
+
+    <pattern id="seats" width="12" height="12" patternUnits="userSpaceOnUse">
+      <path d="M2 2h5v4H2z" fill="#dbeafe" opacity=".65"/>
+    </pattern>
+
+    <clipPath id="stadium">
+      <rect x="145" y="55" width="710" height="590" rx="190"/>
+    </clipPath>
+  </defs>
+
+  <!-- Fundo -->
+  <rect width="1000" height="700" rx="24" fill="url(#bg)"/>
+
+  <!-- Contorno externo -->
+  <rect x="115" y="30" width="770" height="640"
+        rx="220" stroke="#e2e8f0" stroke-width="2" opacity=".8"/>
+
+  <!-- Estrutura externa -->
+  <rect x="145" y="55" width="710" height="590"
+        rx="190" stroke="#bfdbfe" stroke-width="2"/>
+
+  <g clip-path="url(#stadium)">
+
+    <!-- Arquibancada externa -->
+    <rect x="170" y="75" width="660" height="550"
+          rx="175" fill="#17345c" stroke="#e2e8f0" stroke-width="2"/>
+
+    <rect x="190" y="95" width="620" height="510"
+          rx="155" stroke="#e2e8f0" stroke-width="2"/>
+
+    <!-- Fileiras de arquibancadas -->
+    <rect x="205" y="110" width="590" height="480"
+          rx="140" fill="url(#seats)" stroke="#e2e8f0" stroke-width="2"/>
+
+    <rect x="235" y="140" width="530" height="420"
+          rx="115" stroke="#e2e8f0" stroke-width="2"/>
+
+    <rect x="260" y="165" width="480" height="370"
+          rx="95" fill="#102746" stroke="#e2e8f0" stroke-width="2"/>
+
+    <!-- Corredores internos -->
+    <rect x="280" y="185" width="440" height="330"
+          rx="80" stroke="#e2e8f0" stroke-width="2"/>
+
+    <rect x="300" y="205" width="400" height="290"
+          rx="65" stroke="#e2e8f0" stroke-width="2"/>
+
+    <!-- Campo -->
+    <rect x="350" y="250" width="300" height="200"
+          rx="3" fill="#0b1a31" stroke="#f8fafc" stroke-width="3"/>
+
+    <!-- Linhas do campo -->
+    <path d="M500 250V450" stroke="#f8fafc" stroke-width="2"/>
+    <circle cx="500" cy="350" r="34"
+            stroke="#f8fafc" stroke-width="2"/>
+    <circle cx="500" cy="350" r="3" fill="#f8fafc"/>
+
+    <!-- Grandes áreas -->
+    <rect x="350" y="295" width="48" height="110"
+          stroke="#f8fafc" stroke-width="2"/>
+    <rect x="602" y="295" width="48" height="110"
+          stroke="#f8fafc" stroke-width="2"/>
+
+    <!-- Pequenas áreas -->
+    <rect x="350" y="320" width="18" height="60"
+          stroke="#f8fafc" stroke-width="2"/>
+    <rect x="632" y="320" width="18" height="60"
+          stroke="#f8fafc" stroke-width="2"/>
+
+    <!-- Gols -->
+    <path d="M350 325H338V375H350
+             M650 325H662V375H650"
+          stroke="#f8fafc" stroke-width="2"/>
+
+    <!-- Divisões de setores das arquibancadas -->
+    <g stroke="#e2e8f0" stroke-width="2" opacity=".8">
+      <path d="M500 75V205"/>
+      <path d="M500 495V625"/>
+      <path d="M170 350H300"/>
+      <path d="M700 350H830"/>
+
+      <path d="M285 100L350 220"/>
+      <path d="M715 100L650 220"/>
+      <path d="M285 600L350 480"/>
+      <path d="M715 600L650 480"/>
+    </g>
+
+    <!-- Acessos e corredores -->
+    <g stroke="#f8fafc" stroke-width="3" opacity=".9">
+      <path d="M465 75V120"/>
+      <path d="M535 75V120"/>
+      <path d="M465 580V625"/>
+      <path d="M535 580V625"/>
+      <path d="M170 320H215"/>
+      <path d="M170 380H215"/>
+      <path d="M785 320H830"/>
+      <path d="M785 380H830"/>
+    </g>
+
+  </g>
+
+  <!-- Contorno interno da estrutura -->
+  <rect x="145" y="55" width="710" height="590"
+        rx="190" stroke="#f8fafc" stroke-width="2"/>
+
+</svg>
