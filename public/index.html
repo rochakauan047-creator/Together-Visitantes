@@ -1,30 +1,32 @@
-<!DOCTYPE html>
-<html lang="pt-BR" class="h-full bg-slate-950 text-slate-100">
 
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#090d16">
+    <meta name="description" content="Central de Ocorrências da Arena de Pernambuco">
 
-    <title>Together | Central de Ocorrências</title>
+    <title>Together — Central de Ocorrências</title>
 
+    <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
 
+    <!-- Configuração visual -->
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
                         navy: {
-                            950: "#090d16",
-                            900: "#0f172a"
+                            950: '#090d16',
+                            900: '#0f172a',
+                            800: '#172338'
                         },
                         brand: {
-                            500: "#38bdf8",
-                            600: "#0284c7",
-                            700: "#0369a1",
-                            950: "#082f49"
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7'
                         }
                     }
                 }
@@ -32,635 +34,445 @@
         };
     </script>
 
+    <!-- Ícones -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-functions-compat.js"></script>
 
-    <!-- CSS do projeto -->
-    <link rel="stylesheet" href="css/style.css">
-
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            min-height: 100vh;
-            margin: 0;
-            background: #090d16;
-            color: #e2e8f0;
-            font-family: Arial, sans-serif;
-        }
-
-        button,
-        input,
-        textarea {
-            font: inherit;
-        }
-
-        button {
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .main-container {
-            width: min(1400px, 100%);
-            margin: auto;
-            padding: 24px;
-        }
-
-        .panel {
-            background: #0f172a;
-            border: 1px solid #1e293b;
-            border-radius: 16px;
-        }
-
-        .section-label {
-            display: block;
-            margin-bottom: 10px;
-            color: #94a3b8;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: .08em;
-            text-transform: uppercase;
-        }
-
-        .nav-button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 11px 15px;
-            border: 1px solid #263449;
-            border-radius: 10px;
-            background: #111c30;
-            color: #94a3b8;
-            font-size: 12px;
-            font-weight: 700;
-            transition: .2s;
-        }
-
-        .nav-button:hover,
-        .nav-button.active {
-            border-color: #0284c7;
-            background: #082f49;
-            color: #38bdf8;
-        }
-
-        .form-field {
-            width: 100%;
-            padding: 13px 14px;
-            border: 1px solid #334155;
-            border-radius: 10px;
-            outline: none;
-            background: #090f1d;
-            color: #f8fafc;
-        }
-
-        .form-field:focus {
-            border-color: #38bdf8;
-            box-shadow: 0 0 0 2px #38bdf833;
-        }
-
-        .form-field::placeholder {
-            color: #64748b;
-        }
-
-        .category-card {
-            position: relative;
-            display: flex;
-            min-height: 92px;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px 8px;
-            border: 1px solid #263449;
-            border-radius: 12px;
-            background: #111c30;
-            text-align: center;
-            cursor: pointer;
-            transition: .2s;
-        }
-
-        .category-card:has(input:checked) {
-            border: 2px solid #38bdf8;
-            background: #102a42;
-        }
-
-        .category-card input {
-            position: absolute;
-            opacity: 0;
-        }
-
-        .category-card:focus-within {
-            outline: 2px solid #38bdf8;
-        }
-
-        .category-icon {
-            display: grid;
-            width: 35px;
-            height: 35px;
-            place-items: center;
-            border-radius: 9px;
-            background: #1e293b;
-        }
-
-        /* MAPA */
-
-        .arena-map-container {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 1648 / 928;
-            overflow: hidden;
-            border: 1px solid #263449;
-            border-radius: 13px;
-            background: #0b1930;
-        }
-
-        .arena-map-overlay {
-            position: absolute;
-            inset: 0;
-            display: block;
-            width: 100%;
-            height: 100%;
-        }
-
-        .arena-map-overlay polygon {
-            cursor: pointer;
-            stroke-width: 3;
-            stroke-linejoin: round;
-            vector-effect: non-scaling-stroke;
-            fill-opacity: .15;
-            transition: fill-opacity .2s, stroke-width .2s;
-        }
-
-        .arena-map-overlay polygon:hover {
-            fill-opacity: .4;
-            stroke-width: 5;
-        }
-
-        .arena-map-overlay polygon.map-area-selected {
-            fill-opacity: .5;
-            stroke-width: 6;
-        }
-
-        .map-area-legend {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 14px;
-            margin-top: 12px;
-            color: #cbd5e1;
-            font-size: 12px;
-        }
-
-        .map-area-legend span {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-        }
-
-        .map-area-legend i {
-            width: 10px;
-            height: 10px;
-            border-radius: 3px;
-        }
-
-        .legend-red {
-            background: #e11d48;
-        }
-
-        .legend-purple {
-            background: #9333ea;
-        }
-
-        .legend-orange {
-            background: #f97316;
-        }
-
-        .floor-options {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 9px;
-        }
-
-        .floor-option {
-            min-height: 48px;
-            padding: 11px;
-            border: 1px solid #334155;
-            border-radius: 10px;
-            background: #111c30;
-            color: #cbd5e1;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: .2s;
-        }
-
-        .floor-option:hover,
-        .floor-option.active {
-            border-color: #38bdf8;
-            background: #075985;
-            color: white;
-        }
-
-        .primary-button {
-            width: 100%;
-            min-height: 52px;
-            padding: 13px;
-            border-radius: 11px;
-            background: #0284c7;
-            color: white;
-            font-weight: 800;
-            cursor: pointer;
-            transition: .2s;
-        }
-
-        .primary-button:hover {
-            background: #0ea5e9;
-        }
-
-        .primary-button:disabled {
-            cursor: not-allowed;
-            opacity: .6;
-        }
-
-        @media (max-width: 768px) {
-            .main-container {
-                padding: 12px;
-            }
-
-            .nav-button {
-                flex: 1;
-                padding: 10px 5px;
-                font-size: 11px;
-            }
-
-            .category-card {
-                min-height: 84px;
-            }
-        }
-
-        @media (max-width: 420px) {
-            .category-card span {
-                font-size: 11px;
-            }
-
-            .map-area-legend {
-                gap: 9px;
-                font-size: 10px;
-            }
-        }
-    </style>
+    <!-- Estilos -->
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/responsive.css">
 </head>
 
-<body class="flex min-h-screen flex-col">
+<body class="min-h-screen flex flex-col bg-navy-950 text-slate-100 antialiased">
 
     <!-- CABEÇALHO -->
-    <header class="sticky top-0 z-50 border-b border-slate-800 bg-slate-950/95 backdrop-blur">
-        <div class="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3">
+    <header class="sticky top-0 z-50 bg-navy-900/95 border-b border-slate-800 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="min-h-20 flex items-center justify-between gap-4">
 
-            <button onclick="switchTab('visitor')" class="flex items-center gap-3 text-left">
-
-                <div class="rounded-xl border border-sky-500/30 bg-sky-500/10 p-3 text-sky-400">
-                    <i data-lucide="shield-alert" class="h-7 w-7"></i>
-                </div>
-
-                <div>
-                    <span class="text-[10px] font-bold uppercase tracking-widest text-sky-400">
-                        Evento Together
-                    </span>
-
-                    <h1 class="text-base font-bold text-white sm:text-xl">
-                        Central de Ocorrências
-                    </h1>
-
-                    <p class="hidden text-xs text-slate-400 sm:block">
-                        Arena de Pernambuco — Recife-PE
-                    </p>
-                </div>
-            </button>
-
-            <span
-                class="hidden rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1.5 text-xs font-bold text-emerald-400 sm:inline-flex">
-                Sistema de Operações
-            </span>
-
-        </div>
-
-        <!-- NAVEGAÇÃO -->
-        <nav class="mx-auto flex max-w-7xl gap-2 overflow-x-auto px-4 pb-3">
-
-            <button id="navVisitor" class="nav-button active" onclick="switchTab('visitor')">
-                <i data-lucide="map-pin" class="h-4 w-4"></i>
-                Visitantes
-            </button>
-
-            <button id="navStaff" class="nav-button" onclick="switchTab('staff')">
-                <i data-lucide="wrench" class="h-4 w-4"></i>
-                Manutenção
-            </button>
-
-            <button id="navAdmin" class="nav-button" onclick="switchTab('admin')">
-                <i data-lucide="shield-check" class="h-4 w-4"></i>
-                Administrador
-            </button>
-
-        </nav>
-    </header>
-
-    <main class="main-container flex-1">
-
-        <!-- =================================================
-             VISITANTES
-        ================================================== -->
-
-        <section id="tabVisitor" class="space-y-5">
-
-            <div class="panel p-4 sm:p-6">
-
-                <div class="mb-6">
-                    <h2 class="flex items-center gap-2 text-xl font-bold text-white sm:text-2xl">
-                        <i data-lucide="map-pin" class="text-sky-400"></i>
-                        Registrar Ocorrência
-                    </h2>
-
-                    <p class="mt-2 text-sm text-slate-400">
-                        Selecione a categoria, identifique o local no mapa e descreva o problema encontrado.
-                    </p>
-                </div>
-
-                <form id="visitorForm" onsubmit="submitOccurrence(event)" class="space-y-6">
-
-                    <!-- CATEGORIAS -->
+                <button
+                    type="button"
+                    onclick="switchTab('visitor')"
+                    class="flex items-center gap-3 text-left"
+                >
+                    <div class="w-11 h-11 rounded-xl flex items-center justify-center bg-brand-500/10 border border-brand-500/30 text-brand-400">
+                        <i data-lucide="shield-check" class="w-6 h-6"></i>
+                    </div>
 
                     <div>
-                        <label class="section-label">
-                            1. Categoria do problema
-                        </label>
+                        <span class="text-[10px] font-bold uppercase tracking-[.2em] text-brand-400">
+                            Evento Together
+                        </span>
 
-                        <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                        <h1 class="text-base sm:text-xl font-bold text-white">
+                            Central de Ocorrências
+                        </h1>
 
-                            <label class="category-card">
-                                <input type="radio" name="category" value="Hidráulica / Vazamento" required>
-                                <div class="category-icon text-sky-400">
-                                    <i data-lucide="droplets"></i>
+                        <p class="hidden sm:block text-xs text-slate-500">
+                            Arena de Pernambuco — Recife/PE
+                        </p>
+                    </div>
+                </button>
+
+                <div class="flex items-center gap-2">
+                    <span class="hidden sm:inline-flex items-center gap-2 text-xs text-emerald-400">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                        Sistema online
+                    </span>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="flex-1 w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+
+        <!-- ABA DOS VISITANTES -->
+        <section id="tabVisitor" class="space-y-6">
+
+            <div class="bg-navy-900 border border-slate-800 rounded-2xl p-4 sm:p-6 lg:p-8 shadow-xl">
+
+                <!-- INTRODUÇÃO -->
+                <div class="mb-7">
+                    <span class="text-xs font-bold uppercase tracking-widest text-brand-400">
+                        Atendimento ao visitante
+                    </span>
+
+                    <h2 class="text-2xl sm:text-3xl font-bold text-white mt-2">
+                        Registrar ocorrência
+                    </h2>
+
+                    <p class="text-sm text-slate-400 mt-2 max-w-2xl">
+                        Informe o problema encontrado na Arena. Selecione a categoria,
+                        identifique o setor no mapa e descreva a ocorrência.
+                    </p>
+                </div>
+
+                <form
+                    id="visitorForm"
+                    onsubmit="submitOccurrence(event)"
+                    class="space-y-8"
+                >
+
+                    <!-- CATEGORIAS -->
+                    <section>
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="w-7 h-7 rounded-lg bg-brand-500/10 text-brand-400 flex items-center justify-center text-xs font-bold">
+                                01
+                            </span>
+
+                            <h3 class="text-sm font-bold text-white">
+                                Categoria do problema
+                            </h3>
+                        </div>
+
+                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+
+                            <!-- Hidráulica -->
+                            <label class="relative cursor-pointer">
+                                <input
+                                    type="radio"
+                                    name="category"
+                                    value="Hidráulica / Vazamento"
+                                    required
+                                    class="peer sr-only"
+                                >
+
+                                <div class="h-full min-h-28 p-3 rounded-xl border border-slate-700 bg-slate-950/60 flex flex-col items-center justify-center text-center gap-2 transition peer-checked:border-blue-400 peer-checked:bg-blue-500/10">
+                                    <i data-lucide="droplets" class="w-6 h-6 text-blue-400"></i>
+                                    <span class="text-xs font-semibold">Hidráulica</span>
                                 </div>
-                                <span class="text-xs font-semibold">Hidráulica / Vazamento</span>
                             </label>
 
-                            <label class="category-card">
-                                <input type="radio" name="category" value="Elétrica / Iluminação">
-                                <div class="category-icon text-amber-400">
-                                    <i data-lucide="zap"></i>
+                            <!-- Elétrica -->
+                            <label class="relative cursor-pointer">
+                                <input
+                                    type="radio"
+                                    name="category"
+                                    value="Elétrica / Iluminação"
+                                    class="peer sr-only"
+                                >
+
+                                <div class="h-full min-h-28 p-3 rounded-xl border border-slate-700 bg-slate-950/60 flex flex-col items-center justify-center text-center gap-2 transition peer-checked:border-yellow-400 peer-checked:bg-yellow-500/10">
+                                    <i data-lucide="zap" class="w-6 h-6 text-yellow-400"></i>
+                                    <span class="text-xs font-semibold">Elétrica</span>
                                 </div>
-                                <span class="text-xs font-semibold">Elétrica / Iluminação</span>
                             </label>
 
-                            <label class="category-card">
-                                <input type="radio" name="category" value="Limpeza / Sanitários">
-                                <div class="category-icon text-emerald-400">
-                                    <i data-lucide="sparkles"></i>
+                            <!-- Limpeza -->
+                            <label class="relative cursor-pointer">
+                                <input
+                                    type="radio"
+                                    name="category"
+                                    value="Limpeza / Sanitários"
+                                    class="peer sr-only"
+                                >
+
+                                <div class="h-full min-h-28 p-3 rounded-xl border border-slate-700 bg-slate-950/60 flex flex-col items-center justify-center text-center gap-2 transition peer-checked:border-emerald-400 peer-checked:bg-emerald-500/10">
+                                    <i data-lucide="sparkles" class="w-6 h-6 text-emerald-400"></i>
+                                    <span class="text-xs font-semibold">Limpeza</span>
                                 </div>
-                                <span class="text-xs font-semibold">Limpeza / Banheiros</span>
                             </label>
 
-                            <label class="category-card">
-                                <input type="radio" name="category" value="Estrutura / Mobiliário">
-                                <div class="category-icon text-purple-400">
-                                    <i data-lucide="hammer"></i>
+                            <!-- Estrutura -->
+                            <label class="relative cursor-pointer">
+                                <input
+                                    type="radio"
+                                    name="category"
+                                    value="Estrutura / Mobiliário"
+                                    class="peer sr-only"
+                                >
+
+                                <div class="h-full min-h-28 p-3 rounded-xl border border-slate-700 bg-slate-950/60 flex flex-col items-center justify-center text-center gap-2 transition peer-checked:border-orange-400 peer-checked:bg-orange-500/10">
+                                    <i data-lucide="hammer" class="w-6 h-6 text-orange-400"></i>
+                                    <span class="text-xs font-semibold">Estrutura</span>
                                 </div>
-                                <span class="text-xs font-semibold">Estrutura / Assentos</span>
                             </label>
 
-                            <label class="category-card">
-                                <input type="radio" name="category" value="Acesso / Sinalização">
-                                <div class="category-icon text-rose-400">
-                                    <i data-lucide="signpost"></i>
+                            <!-- Acesso -->
+                            <label class="relative cursor-pointer">
+                                <input
+                                    type="radio"
+                                    name="category"
+                                    value="Acesso / Sinalização"
+                                    class="peer sr-only"
+                                >
+
+                                <div class="h-full min-h-28 p-3 rounded-xl border border-slate-700 bg-slate-950/60 flex flex-col items-center justify-center text-center gap-2 transition peer-checked:border-red-400 peer-checked:bg-red-500/10">
+                                    <i data-lucide="signpost" class="w-6 h-6 text-red-400"></i>
+                                    <span class="text-xs font-semibold">Acesso</span>
                                 </div>
-                                <span class="text-xs font-semibold">Acesso / Sinalização</span>
                             </label>
 
-                            <label class="category-card">
-                                <input type="radio" name="category" value="Outros">
-                                <div class="category-icon text-slate-400">
-                                    <i data-lucide="more-horizontal"></i>
+                            <!-- Outros -->
+                            <label class="relative cursor-pointer">
+                                <input
+                                    type="radio"
+                                    name="category"
+                                    value="Outros"
+                                    class="peer sr-only"
+                                >
+
+                                <div class="h-full min-h-28 p-3 rounded-xl border border-slate-700 bg-slate-950/60 flex flex-col items-center justify-center text-center gap-2 transition peer-checked:border-slate-400 peer-checked:bg-slate-500/10">
+                                    <i data-lucide="more-horizontal" class="w-6 h-6 text-slate-400"></i>
+                                    <span class="text-xs font-semibold">Outros</span>
                                 </div>
-                                <span class="text-xs font-semibold">Outros</span>
                             </label>
 
                         </div>
-                    </div>
+                    </section>
 
-                    <!-- MAPA E LOCAL -->
+                    <!-- MAPA E LOCALIZAÇÃO -->
+                    <section class="space-y-4">
 
-                    <div class="grid grid-cols-1 items-start gap-5 lg:grid-cols-12">
+                        <div class="flex items-center gap-3">
+                            <span class="w-7 h-7 rounded-lg bg-brand-500/10 text-brand-400 flex items-center justify-center text-xs font-bold">
+                                02
+                            </span>
 
-                        <div class="panel min-w-0 p-3 sm:p-4 lg:col-span-7">
-
-                            <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
-                                <label class="section-label mb-0">
-                                    2. Selecione a zona
-                                </label>
-
-                                <span id="selectedSectorBadge"
-                                    class="rounded-full border border-slate-700 bg-slate-950 px-3 py-1 text-xs font-bold text-sky-400">
-                                    Nenhum setor selecionado
-                                </span>
-                            </div>
-
-                            <!--
-                              MAPA ESQUEMÁTICO
-                              As coordenadas das zonas devem corresponder
-                              aos contornos reais da planta da Arena.
-                            -->
-
-                            <div class="arena-map-container">
-
-<svg
-    id="arenaMapSvg"
-    class="arena-map-overlay"
-    viewBox="0 0 512 512"
-    preserveAspectRatio="xMidYMid meet"
-    role="group"
-    aria-label="Mapa esquemático da Arena">
-
-    <!-- Fundo -->
-    <rect width="512" height="512" fill="#020717"/>
-
-    <!-- Contorno externo do estádio -->
-    <rect x="67" y="33" width="345" height="457"
-          rx="72" fill="none"
-          stroke="white" stroke-width="3"/>
-
-    <!-- Área interna de referência -->
-    <rect x="100" y="84" width="273" height="370"
-          rx="6" fill="none"
-          stroke="white" stroke-width="3"/>
-
-    <!-- Campo de futebol -->
-    <g fill="none" stroke="white" stroke-width="8">
-        <path d="M153 150 H321 V390 H153 Z"/>
-        <path d="M153 269 H321"/>
-        <circle cx="237" cy="269" r="30"/>
-
-        <!-- Área superior -->
-        <path d="M190 150 V180 Q190 193 203 193 H273 Q286 193 286 180 V150"/>
-        <path d="M211 193 Q237 225 263 193"/>
-
-        <!-- Área inferior -->
-        <path d="M190 390 V359 Q190 347 203 347 H273 Q286 347 286 359 V390"/>
-        <path d="M211 347 Q237 315 263 347"/>
-    </g>
-
-    <!-- ÁREA VERMELHA -->
-    <path
-        data-map-area="vermelho"
-        tabindex="0"
-        role="button"
-        aria-label="Selecionar área vermelha"
-        aria-pressed="false"
-        onclick="selectMapArea('vermelho')"
-        d="M68 134 L136 86 L136 452 L68 404 Z"
-        fill="#e11d48"
-        fill-opacity=".12"
-        stroke="#ff3038"
-        stroke-width="6"
-        stroke-linejoin="round"
-    />
-
-    <!-- ÁREA LARANJA -->
-    <path
-        data-map-area="laranja"
-        tabindex="0"
-        role="button"
-        aria-label="Selecionar área laranja"
-        aria-pressed="false"
-        onclick="selectMapArea('laranja')"
-        d="M153 143 L207 86 L267 86 L321 143 L321 397 L267 452 L207 452 L153 397 Z"
-        fill="#f97316"
-        fill-opacity=".10"
-        stroke="#ff8a00"
-        stroke-width="8"
-        stroke-linejoin="round"
-    />
-
-    <!-- ÁREA ROXA -->
-    <path
-        data-map-area="roxo"
-        tabindex="0"
-        role="button"
-        aria-label="Selecionar área roxa"
-        aria-pressed="false"
-        onclick="selectMapArea('roxo')"
-        d="M336 86 L410 134 L410 404 L336 452 Z"
-        fill="#9333ea"
-        fill-opacity=".12"
-        stroke="#a855f7"
-        stroke-width="6"
-        stroke-linejoin="round"
-    />
-
-</svg>
-
-                            </div>
-
-                            <div class="map-area-legend">
-                                <span><i class="legend-red"></i> Área vermelha</span>
-                                <span><i class="legend-orange"></i> Área laranja</span>
-                                <span><i class="legend-purple"></i> Área roxa</span>
-                            </div>
-
-                            <!-- PAVIMENTOS -->
-
-                            <div class="mt-5 border-t border-slate-800 pt-4">
-
-                                <h3 id="mapFloorTitle" class="mb-3 text-sm font-bold text-white">
-                                    3. Escolha uma zona primeiro
+                            <div>
+                                <h3 class="text-sm font-bold text-white">
+                                    Localização da ocorrência
                                 </h3>
 
-                                <div id="mapFloorOptions" class="floor-options hidden">
+                                <p class="text-xs text-slate-500">
+                                    Toque em um dos oito setores numerados do mapa.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+                            <!-- MAPA -->
+                            <div class="lg:col-span-7 min-w-0 bg-slate-950 border border-slate-800 rounded-2xl p-3 sm:p-4">
+
+                                <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400">
+                                        Mapa da Arena
+                                    </span>
+
+                                    <span
+                                        id="selectedSectorBadge"
+                                        class="text-xs font-semibold text-slate-300 bg-slate-900 border border-slate-700 px-3 py-2 rounded-lg"
+                                    >
+                                        Nenhum setor selecionado
+                                    </span>
+                                </div>
+
+                                <!-- IMAGEM DE FUNDO E SVG -->
+                              
+
+<div class="arena-map-container">
+    <img
+        src="./arena-map-base.png"
+        class="arena-map-image"
+        alt="Mapa da Arena de Pernambuco"
+    >
+
+    <svg
+        id="arenaMapSvg"
+        class="arena-map-overlay"
+        viewBox="0 0 1254 1254"
+        preserveAspectRatio="none"
+        role="group"
+        aria-label="Selecione um setor da Arena"
+    >
+        <!-- SETORES SUPERIORES -->
+        <path data-map-area="laranja-3" class="map-zone zone-orange"
+            tabindex="0" role="button" aria-pressed="false"
+            aria-label="Setor 3"
+            d="M300 300 Q340 220 470 215 L627 215 L627 345 L430 345 Q355 345 300 300 Z"/>
+
+        <path data-map-area="laranja-4" class="map-zone zone-orange"
+            tabindex="0" role="button" aria-pressed="false"
+            aria-label="Setor 4"
+            d="M627 215 L785 215 Q915 220 955 300 L825 345 L627 345 Z"/>
+
+        <!-- LATERAL ESQUERDA -->
+        <path data-map-area="azul-7" class="map-zone zone-blue"
+            tabindex="0" role="button" aria-pressed="false"
+            aria-label="Setor 7"
+            d="M300 300 Q270 355 270 445 L270 620 L405 620 L405 450 Q405 390 430 345 Z"/>
+
+        <path data-map-area="azul-8" class="map-zone zone-blue"
+            tabindex="0" role="button" aria-pressed="false"
+            aria-label="Setor 8"
+            d="M270 620 L405 620 L405 770 Q405 830 430 875 L300 925 Q270 875 270 790 Z"/>
+
+        <!-- LATERAL DIREITA -->
+        <path data-map-area="amarelo-5" class="map-zone zone-yellow"
+            tabindex="0" role="button" aria-pressed="false"
+            aria-label="Setor 5"
+            d="M955 300 Q1000 355 1000 445 L1000 620 L870 620 L870 450 Q870 390 825 345 Z"/>
+
+        <path data-map-area="amarelo-6" class="map-zone zone-yellow"
+            tabindex="0" role="button" aria-pressed="false"
+            aria-label="Setor 6"
+            d="M870 620 L1000 620 L1000 790 Q1000 875 955 925 L825 875 Q870 830 870 770 Z"/>
+
+        <!-- SETORES INFERIORES -->
+        <path data-map-area="vermelho-1" class="map-zone zone-red"
+            tabindex="0" role="button" aria-pressed="false"
+            aria-label="Setor 1"
+            d="M300 925 L430 875 Q480 855 627 855 L627 985 L470 985 Q350 985 300 925 Z"/>
+
+        <path data-map-area="vermelho-2" class="map-zone zone-red"
+            tabindex="0" role="button" aria-pressed="false"
+            aria-label="Setor 2"
+            d="M627 855 Q775 855 825 875 L955 925 Q905 985 785 985 L627 985 Z"/>
+
+        <!-- NUMERAÇÃO -->
+        <g class="map-area-numbers" aria-hidden="true">
+            <text x="465" y="285">3</text>
+            <text x="790" y="285">4</text>
+            <text x="340" y="515">7</text>
+            <text x="340" y="795">8</text>
+            <text x="920" y="515">5</text>
+            <text x="920" y="795">6</text>
+            <text x="465" y="925">1</text>
+            <text x="790" y="925">2</text>
+        </g>
+    </svg>
+</div>
+
+
+                                <!-- LEGENDA -->
+                                <div class="map-area-legend">
+                                    <span>
+                                        <i class="legend-orange"></i>
+                                        Laranja
+                                    </span>
+
+                                    <span>
+                                        <i class="legend-red"></i>
+                                        Vermelho
+                                    </span>
+
+                                    <span>
+                                        <i class="legend-yellow"></i>
+                                        Amarelo
+                                    </span>
+
+                                    <span>
+                                        <i class="legend-blue"></i>
+                                        Azul
+                                    </span>
+                                </div>
+
+                                <!-- PAVIMENTOS -->
+                                <div class="mt-5 pt-5 border-t border-slate-800">
+                                    <h3
+                                        id="mapFloorTitle"
+                                        class="text-sm font-bold text-white mb-3"
+                                    >
+                                        03. Escolha uma área primeiro
+                                    </h3>
+
+                                    <div
+                                        id="mapFloorOptions"
+                                        class="floor-options hidden"
+                                    ></div>
                                 </div>
 
                             </div>
 
-                        </div>
+                            <!-- FORMULÁRIO LOCAL -->
+                            <div class="lg:col-span-5 space-y-5 min-w-0">
 
-                        <!-- FORMULÁRIO -->
+                                <!-- LOCAL SELECIONADO -->
+                                <div>
+                                    <label
+                                        for="locationInput"
+                                        class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2"
+                                    >
+                                        03. Local selecionado
+                                    </label>
 
-                        <div class="min-w-0 space-y-5 lg:col-span-5">
+                                    <input
+                                        type="text"
+                                        id="locationInput"
+                                        name="location"
+                                        required
+                                        readonly
+                                        placeholder="Selecione a área e o pavimento"
+                                        class="w-full px-4 py-3.5 bg-slate-950 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                                    >
 
-                            <div>
-                                <label for="locationInput" class="section-label">
-                                    4. Local selecionado
-                                </label>
+                                    <p class="text-xs text-slate-500 mt-2">
+                                        Selecione a área e depois o pavimento correspondente.
+                                    </p>
+                                </div>
 
-                                <input type="text" id="locationInput" name="location" required readonly
-                                    placeholder="Selecione a zona e o pavimento" class="form-field">
+                                <!-- DESCRIÇÃO -->
+                                <div>
+                                    <label
+                                        for="descriptionInput"
+                                        class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2"
+                                    >
+                                        04. Descrição do problema
+                                    </label>
 
-                                <p class="mt-2 text-xs text-slate-500">
-                                    Confira se a localização selecionada corresponde ao local do problema.
+                                    <textarea
+                                        id="descriptionInput"
+                                        name="description"
+                                        rows="7"
+                                        maxlength="1500"
+                                        required
+                                        placeholder="Descreva o problema encontrado, indicando pontos de referência..."
+                                        class="w-full px-4 py-3.5 bg-slate-950 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 resize-y"
+                                    ></textarea>
+
+                                    <p class="text-xs text-slate-500 mt-2">
+                                        Máximo de 1500 caracteres.
+                                    </p>
+                                </div>
+
+                                <!-- ENVIAR -->
+                                <button
+                                    type="submit"
+                                    id="submitBtn"
+                                    class="w-full min-h-14 px-5 py-4 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold shadow-lg transition flex items-center justify-center gap-3"
+                                >
+                                    <i data-lucide="send" class="w-5 h-5"></i>
+                                    <span>Registrar ocorrência</span>
+                                </button>
+
+                                <p class="text-center text-xs text-slate-500">
+                                    Sua ocorrência será encaminhada à equipe de manutenção.
                                 </p>
+
                             </div>
-
-                            <div>
-                                <label for="descriptionInput" class="section-label">
-                                    5. Descrição da ocorrência
-                                </label>
-
-                                <textarea id="descriptionInput" name="description" rows="7" maxlength="1500" required
-                                    placeholder="Descreva o problema encontrado..."
-                                    class="form-field resize-y"></textarea>
-
-                                <p class="mt-2 text-right text-xs text-slate-500">
-                                    Até 1500 caracteres
-                                </p>
-                            </div>
-
-                            <button type="submit" id="submitBtn" class="primary-button">
-
-                                <span class="inline-flex items-center justify-center gap-2">
-                                    <i data-lucide="send" class="h-4 w-4"></i>
-                                    Registrar ocorrência
-                                </span>
-
-                            </button>
-
-                            <p class="text-center text-xs text-slate-500">
-                                A ocorrência será encaminhada à equipe responsável.
-                            </p>
-
                         </div>
-
-                    </div>
+                    </section>
 
                 </form>
             </div>
         </section>
 
-        <!-- =================================================
-             MANUTENÇÃO
-        ================================================== -->
-
+        <!-- ABA DA MANUTENÇÃO -->
         <section id="tabStaff" class="hidden space-y-6">
 
-            <div id="staffAuthBox" class="panel mx-auto max-w-md p-6 sm:p-8">
-
-                <div class="mb-6 text-center">
-                    <div class="mb-3 inline-flex rounded-xl border border-sky-500/30 bg-sky-500/10 p-3 text-sky-400">
-                        <i data-lucide="wrench" class="h-8 w-8"></i>
+            <!-- LOGIN -->
+            <div
+                id="staffAuthBox"
+                class="max-w-md mx-auto bg-navy-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl"
+            >
+                <div class="text-center mb-7">
+                    <div class="inline-flex p-4 rounded-2xl bg-brand-500/10 text-brand-400 border border-brand-500/20 mb-4">
+                        <i data-lucide="wrench" class="w-8 h-8"></i>
                     </div>
 
                     <h2 class="text-2xl font-bold text-white">
                         Acesso da Manutenção
                     </h2>
 
-                    <p class="mt-2 text-sm text-slate-400">
+                    <p class="text-sm text-slate-400 mt-2">
                         Entre com seu nome e código de acesso.
                     </p>
                 </div>
@@ -668,239 +480,295 @@
                 <form onsubmit="handleStaffLogin(event)" class="space-y-4">
 
                     <div>
-                        <label class="section-label" for="staffNameInput">
+                        <label for="staffNameInput" class="section-label">
                             Nome do funcionário
                         </label>
 
-                        <input id="staffNameInput" type="text" maxlength="80" required placeholder="Seu nome"
-                            class="form-field">
+                        <input
+                            id="staffNameInput"
+                            type="text"
+                            maxlength="80"
+                            required
+                            placeholder="Seu nome"
+                            class="form-field"
+                        >
                     </div>
 
                     <div>
-                        <label class="section-label" for="staffCodeInput">
+                        <label for="staffCodeInput" class="section-label">
                             Código de acesso
                         </label>
 
-                        <input id="staffCodeInput" type="text" minlength="6" maxlength="6" pattern="[A-Za-z0-9]{6}"
-                            autocomplete="one-time-code" required placeholder="ABC123"
-                            class="form-field text-center font-mono text-xl uppercase tracking-widest">
+                        <input
+                            id="staffCodeInput"
+                            type="text"
+                            minlength="6"
+                            maxlength="6"
+                            pattern="[A-Za-z0-9]{6}"
+                            autocomplete="one-time-code"
+                            required
+                            placeholder="ABC123"
+                            class="form-field text-center font-mono text-xl uppercase tracking-widest"
+                        >
                     </div>
 
-                    <button type="submit" class="primary-button">
+                    <button type="submit" class="primary-button w-full">
+                        <i data-lucide="log-in" class="w-5 h-5"></i>
                         Acessar painel
                     </button>
 
                 </form>
             </div>
 
-            <div id="staffDashboard" class="hidden space-y-5">
+            <!-- PAINEL DA EQUIPE -->
+            <div id="staffDashboard" class="hidden space-y-6">
 
-                <div class="panel flex flex-col justify-between gap-3 p-4 sm:flex-row sm:items-center">
+                <!-- IDENTIFICAÇÃO -->
+                <div class="bg-navy-900 border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
 
-                    <div>
-                        <span class="text-xs font-bold uppercase text-sky-400">
-                            Equipe de manutenção
-                        </span>
+                    <div class="flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-full bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-400 font-bold">
+                            <span id="staffAvatar">M</span>
+                        </div>
 
-                        <h2 id="staffDisplayName" class="mt-1 text-lg font-bold text-white">
-                            Funcionário
-                        </h2>
+                        <div>
+                            <span class="text-xs text-slate-500 uppercase font-bold">
+                                Técnico em atendimento
+                            </span>
+
+                            <h3 id="staffDisplayName" class="text-lg font-bold text-white">
+                                Carregando...
+                            </h3>
+                        </div>
                     </div>
 
-                    <button onclick="logoutStaff()"
-                        class="rounded-lg border border-rose-500/30 bg-rose-500/10 px-4 py-2 text-xs font-bold text-rose-400">
-                        <i data-lucide="log-out" class="mr-1 inline h-4 w-4"></i>
-                        Sair
+                    <button
+                        onclick="logoutStaff()"
+                        class="px-4 py-2 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-bold"
+                    >
+                        <i data-lucide="log-out" class="w-4 h-4 inline"></i>
+                        Encerrar sessão
                     </button>
-
-                    <span id="staffAvatar" class="hidden"></span>
 
                 </div>
 
                 <!-- CONTADORES -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
 
-                <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                    <div class="bg-navy-900 border border-slate-800 rounded-2xl p-5 flex items-center justify-between">
+                        <div>
+                            <p class="text-xs uppercase font-bold text-amber-400">
+                                Em aberto
+                            </p>
 
-                    <div class="panel p-5">
-                        <p class="text-xs font-bold uppercase text-amber-400">
-                            Em aberto
-                        </p>
-                        <p id="countOpen" class="mt-2 text-3xl font-extrabold text-white">0</p>
+                            <p id="countOpen" class="text-3xl font-extrabold text-white mt-2">
+                                0
+                            </p>
+                        </div>
+
+                        <i data-lucide="clock" class="w-7 h-7 text-amber-400"></i>
                     </div>
 
-                    <div class="panel p-5">
-                        <p class="text-xs font-bold uppercase text-sky-400">
-                            Em andamento
-                        </p>
-                        <p id="countProgress" class="mt-2 text-3xl font-extrabold text-white">0</p>
+                    <div class="bg-navy-900 border border-slate-800 rounded-2xl p-5 flex items-center justify-between">
+                        <div>
+                            <p class="text-xs uppercase font-bold text-blue-400">
+                                Em atendimento
+                            </p>
+
+                            <p id="countProgress" class="text-3xl font-extrabold text-white mt-2">
+                                0
+                            </p>
+                        </div>
+
+                        <i data-lucide="loader-circle" class="w-7 h-7 text-blue-400"></i>
                     </div>
 
-                    <div class="panel p-5">
-                        <p class="text-xs font-bold uppercase text-emerald-400">
-                            Concluídas
-                        </p>
-                        <p id="countDone" class="mt-2 text-3xl font-extrabold text-white">0</p>
+                    <div class="bg-navy-900 border border-slate-800 rounded-2xl p-5 flex items-center justify-between">
+                        <div>
+                            <p class="text-xs uppercase font-bold text-emerald-400">
+                                Finalizadas
+                            </p>
+
+                            <p id="countDone" class="text-3xl font-extrabold text-white mt-2">
+                                0
+                            </p>
+                        </div>
+
+                        <i data-lucide="check-circle" class="w-7 h-7 text-emerald-400"></i>
                     </div>
 
                 </div>
 
-                <!-- FILTROS -->
+                <!-- FILA DE OCORRÊNCIAS -->
+                <div class="bg-navy-900 border border-slate-800 rounded-2xl p-4 sm:p-6 space-y-5">
 
-                <div class="panel p-4 sm:p-6">
-
-                    <div class="mb-5">
-                        <h3 class="text-lg font-bold text-white">
+                    <div class="flex flex-col gap-4 border-b border-slate-800 pb-4">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i data-lucide="list-filter" class="text-brand-400"></i>
                             Fila de ocorrências
                         </h3>
-                        <p class="mt-1 text-xs text-slate-400">
-                            Acompanhe e atualize os chamados recebidos.
-                        </p>
+
+                        <div class="flex flex-wrap gap-2">
+
+                            <button
+                                onclick="filterStaffList('all')"
+                                id="filterBtnAll"
+                                class="px-3 py-2 rounded-lg text-xs font-semibold text-white bg-brand-600"
+                            >
+                                Todas
+                            </button>
+
+                            <button
+                                onclick="filterStaffList('open')"
+                                id="filterBtnOpen"
+                                class="px-3 py-2 rounded-lg text-xs font-semibold text-slate-400"
+                            >
+                                Abertas
+                            </button>
+
+                            <button
+                                onclick="filterStaffList('progress')"
+                                id="filterBtnProgress"
+                                class="px-3 py-2 rounded-lg text-xs font-semibold text-slate-400"
+                            >
+                                Em atendimento
+                            </button>
+
+                            <button
+                                onclick="filterStaffList('done')"
+                                id="filterBtnDone"
+                                class="px-3 py-2 rounded-lg text-xs font-semibold text-slate-400"
+                            >
+                                Finalizadas
+                            </button>
+
+                        </div>
                     </div>
 
-                    <div class="mb-5 flex flex-wrap gap-2">
-
-                        <button id="filterBtnAll" onclick="filterStaffList('all')"
-                            class="rounded-lg bg-sky-600 px-3 py-2 text-xs font-bold text-white">
-                            Todas
-                        </button>
-
-                        <button id="filterBtnOpen" onclick="filterStaffList('open')"
-                            class="rounded-lg px-3 py-2 text-xs font-bold text-slate-400">
-                            Abertas
-                        </button>
-
-                        <button id="filterBtnProgress" onclick="filterStaffList('progress')"
-                            class="rounded-lg px-3 py-2 text-xs font-bold text-slate-400">
-                            Em andamento
-                        </button>
-
-                        <button id="filterBtnDone" onclick="filterStaffList('done')"
-                            class="rounded-lg px-3 py-2 text-xs font-bold text-slate-400">
-                            Concluídas
-                        </button>
-
-                    </div>
-
-                    <div id="staffOccurrencesList" class="min-h-[250px] space-y-3">
-
-                        <div class="py-10 text-center text-sm text-slate-500">
+                    <div
+                        id="staffOccurrencesList"
+                        class="space-y-3 min-h-[250px]"
+                    >
+                        <div class="text-center py-12 text-slate-500 text-sm">
+                            <i data-lucide="inbox" class="w-8 h-8 mx-auto mb-3 opacity-50"></i>
                             As ocorrências aparecerão aqui.
                         </div>
-
                     </div>
 
                 </div>
             </div>
         </section>
 
-        <!-- =================================================
-             ADMINISTRADOR
-        ================================================== -->
+        <!-- ABA DO ADMINISTRADOR -->
+        <section id="tabAdmin" class="hidden space-y-6">
 
-        <section id="tabAdmin" class="hidden">
+            <div class="max-w-2xl mx-auto bg-navy-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl">
 
-            <div class="panel mx-auto max-w-2xl p-6 sm:p-8">
+                <!-- LOGIN ADMIN -->
+                <div id="adminAuthBox" class="text-center space-y-5">
 
-                <!-- AUTENTICAÇÃO -->
-
-                <div id="adminAuthBox" class="space-y-5 text-center">
-
-                    <div
-                        class="inline-flex rounded-xl border border-purple-500/30 bg-purple-500/10 p-3 text-purple-400">
-                        <i data-lucide="shield-check" class="h-8 w-8"></i>
+                    <div class="inline-flex p-4 rounded-2xl bg-purple-500/10 border border-purple-500/30 text-purple-400">
+                        <i data-lucide="shield-check" class="w-8 h-8"></i>
                     </div>
 
                     <h2 class="text-2xl font-bold text-white">
-                        Painel administrativo
+                        Painel do Administrador
                     </h2>
 
-                    <p class="text-sm text-slate-400">
-                        Área restrita ao administrador autorizado.
+                    <p class="text-sm text-slate-400 max-w-md mx-auto">
+                        Área restrita para geração de códigos temporários de acesso da equipe.
                     </p>
 
-                    <button onclick="loginAdminGoogle()"
-                        class="mx-auto flex items-center justify-center gap-3 rounded-xl border border-slate-700 bg-slate-800 px-6 py-3 font-bold text-white hover:bg-slate-700">
+                    <button
+                        onclick="loginAdminGoogle()"
+                        class="px-6 py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-semibold flex items-center justify-center gap-3 mx-auto transition"
+                    >
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
+                            <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.2 9 5 12 5z"/>
+                            <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.7-.2-2.3H12v4.6h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"/>
+                            <path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 10.8 0 12s.7 2.3 1.9 4.7l3.7-1.9z"/>
+                            <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.2-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z"/>
+                        </svg>
 
-                        <i data-lucide="mail" class="h-5 w-5"></i>
                         Entrar com Google
-
                     </button>
 
                 </div>
 
                 <!-- PAINEL ADMINISTRATIVO -->
-
                 <div id="adminPanel" class="hidden space-y-6">
 
-                    <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
+                    <div class="flex items-center justify-between gap-4 border-b border-slate-800 pb-4">
 
                         <div>
-                            <span class="text-xs font-bold uppercase text-purple-400">
-                                Administrador conectado
+                            <span class="text-xs font-bold uppercase tracking-wider text-purple-400">
+                                Sessão administrativa
                             </span>
 
-                            <p id="adminEmail" class="mt-1 text-sm font-semibold text-white">
-                                Administrador
-                            </p>
+                            <h3 id="adminEmail" class="text-sm font-semibold text-white mt-1">
+                                Administrador autorizado
+                            </h3>
                         </div>
 
-                        <button onclick="logoutAdmin()" class="text-xs font-bold text-rose-400 hover:text-rose-300">
-                            Encerrar sessão
+                        <button
+                            onclick="logoutAdmin()"
+                            class="text-xs text-slate-400 hover:text-white underline"
+                        >
+                            Sair
                         </button>
 
                     </div>
 
                     <div class="space-y-4">
 
-                        <div>
-                            <h3 class="flex items-center gap-2 text-lg font-bold text-white">
-                                <i data-lucide="key" class="text-sky-400"></i>
-                                Códigos de acesso
-                            </h3>
-
-                            <p class="mt-2 text-sm text-slate-400">
-                                Gere códigos temporários para a equipe de manutenção.
-                            </p>
-                        </div>
-
-                        <button onclick="generateAccessCode()"
-                            class="flex min-h-[52px] w-full items-center justify-center gap-2 rounded-xl bg-purple-600 px-4 py-3 font-bold text-white hover:bg-purple-500">
-
-                            <i data-lucide="plus-circle" class="h-5 w-5"></i>
+                        <h4 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i data-lucide="key" class="text-brand-400"></i>
                             Gerar código de acesso
+                        </h4>
 
+                        <p class="text-sm text-slate-400">
+                            O código será válido por 24 horas e deverá ser compartilhado somente com a equipe autorizada.
+                        </p>
+
+                        <button
+                            onclick="generateAccessCode()"
+                            class="w-full py-4 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold flex items-center justify-center gap-3 transition"
+                        >
+                            <i data-lucide="sparkles" class="w-5 h-5"></i>
+                            Gerar código de 6 caracteres
                         </button>
 
-                        <div id="generatedCodeBox"
-                            class="hidden rounded-xl border border-purple-500/30 bg-slate-950 p-5 text-center">
-
-                            <span class="text-xs font-bold uppercase text-slate-400">
+                        <div
+                            id="generatedCodeBox"
+                            class="hidden bg-slate-950 border border-purple-500/40 rounded-xl p-5 text-center space-y-3"
+                        >
+                            <span class="text-xs uppercase text-slate-400 font-bold">
                                 Código gerado
                             </span>
 
-                            <div class="mt-3 flex items-center justify-center gap-4">
-
-                                <span id="codeDisplay"
-                                    class="font-mono text-3xl font-extrabold tracking-widest text-sky-400">
+                            <div class="flex items-center justify-center gap-4">
+                                <span
+                                    id="codeDisplay"
+                                    class="text-3xl font-mono font-extrabold text-brand-400 tracking-widest"
+                                >
                                     ------
                                 </span>
 
-                                <button onclick="copyGeneratedCode()"
-                                    class="rounded-lg border border-slate-700 bg-slate-800 p-3 text-white hover:bg-slate-700"
-                                    aria-label="Copiar código">
-                                    <i data-lucide="copy" class="h-5 w-5"></i>
+                                <button
+                                    onclick="copyGeneratedCode()"
+                                    class="p-3 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white"
+                                    title="Copiar código"
+                                >
+                                    <i data-lucide="copy" class="w-5 h-5"></i>
                                 </button>
-
                             </div>
 
-                            <p class="mt-3 text-xs text-amber-400">
-                                Validade de 24 horas.
+                            <p class="text-xs text-amber-400">
+                                Este código expira em 24 horas.
                             </p>
-
                         </div>
 
                     </div>
-
                 </div>
             </div>
         </section>
@@ -908,53 +776,20 @@
     </main>
 
     <!-- RODAPÉ -->
+    <footer class="mt-auto border-t border-slate-800 bg-navy-900 px-4 py-5 text-center">
+        <p class="text-xs text-slate-500">
+            © 2026 Arena de Pernambuco — Evento Together.
+        </p>
 
-    <footer class="mt-auto border-t border-slate-800 bg-slate-950 px-4 py-5 text-center text-xs text-slate-500">
-        Together — Arena de Pernambuco · Central de Ocorrências
+        <p class="text-[10px] text-slate-600 mt-1">
+            Central de Ocorrências e Operações de Manutenção.
+        </p>
     </footer>
 
-    <!-- SCRIPTS DO PROJETO -->
-    <script src="js/firebase-config.js"></script>
-    <script src="js/map.js"></script>
-    <script src="js/app.js"></script>
-
-    <!-- AJUSTES VISUAIS DA NAVEGAÇÃO -->
-    <script>
-        const navigationButtons = {
-            visitor: "navVisitor",
-            staff: "navStaff",
-            admin: "navAdmin"
-        };
-
-        const originalSwitchTab = window.switchTab;
-
-        // O app.js declara switchTab como função global.
-        document.addEventListener("DOMContentLoaded", () => {
-            if (window.lucide) {
-                lucide.createIcons();
-            }
-
-            document.querySelectorAll(".nav-button").forEach(button => {
-                button.addEventListener("click", () => {
-                    document.querySelectorAll(".nav-button").forEach(item => {
-                        item.classList.remove("active");
-                    });
-
-                    button.classList.add("active");
-                });
-            });
-
-            document.querySelectorAll("[data-map-area]").forEach(polygon => {
-                polygon.addEventListener("keydown", event => {
-                    if (event.key === "Enter" || event.key === " ") {
-                        event.preventDefault();
-                        polygon.click();
-                    }
-                });
-            });
-        });
-    </script>
+    <!-- SCRIPTS -->
+    <script src="./js/firebase-config.js"></script>
+    <script src="./js/map.js"></script>
+    <script src="./js/app.js"></script>
 
 </body>
-
 </html>

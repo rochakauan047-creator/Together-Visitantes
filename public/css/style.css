@@ -1,85 +1,24 @@
 
-/* =====================================================
-   TOGETHER-VISITANTES
-   INTERFACE E MAPA INTERATIVO
-   ===================================================== */
+/* ==================================================
+   TOGETHER — MAPA DA ARENA
+   Imagem original: 1254 × 1254 px
+================================================== */
 
-:root {
-    color-scheme: dark;
-
-    --arena-bg: #090d16;
-    --arena-surface: #0f172a;
-    --arena-border: #1e293b;
-    --arena-text: #e2e8f0;
-    --arena-muted: #94a3b8;
-
-    --arena-blue: #38bdf8;
-    --arena-cyan: #22d3ee;
-
-    --zone-red: #e11d48;
-    --zone-purple: #9333ea;
-    --zone-orange: #f97316;
-}
-
-/* =====================================================
-   CONFIGURAÇÕES GERAIS
-   ===================================================== */
-
-* {
-    box-sizing: border-box;
-    scrollbar-width: thin;
-    scrollbar-color: var(--arena-border) var(--arena-bg);
-}
-
-html {
-    width: 100%;
-    overflow-x: hidden;
-    scroll-behavior: smooth;
-}
-
-body {
-    width: 100%;
-    min-width: 320px;
-    margin: 0;
-    overflow-x: hidden;
-    background: var(--arena-bg);
-    color: var(--arena-text);
-}
-
-img,
-svg {
-    max-width: 100%;
-}
-
-input,
-textarea,
-select,
-button {
-    font: inherit;
-}
-
-button {
-    -webkit-tap-highlight-color: transparent;
-}
-
-button:disabled {
-    cursor: not-allowed;
-    opacity: .6;
-}
-
-/* =====================================================
-   MAPA DA ARENA
-   ===================================================== */
+/* ESTRUTURA PRINCIPAL */
 
 .arena-map-container {
     position: relative;
     width: 100%;
+    max-width: 650px;
     aspect-ratio: 1 / 1;
+    margin: 0 auto;
     overflow: hidden;
-    border: 1px solid var(--arena-border);
     border-radius: 14px;
-    background: #020717;
+    background: #091426;
+    isolation: isolate;
 }
+
+/* IMAGEM DE FUNDO */
 
 .arena-map-image {
     position: absolute;
@@ -87,8 +26,14 @@ button:disabled {
     display: block;
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: fill;
+    object-position: center;
+    z-index: 1;
+    pointer-events: none;
+    user-select: none;
 }
+
+/* CAMADA SVG */
 
 .arena-map-overlay {
     position: absolute;
@@ -96,253 +41,558 @@ button:disabled {
     display: block;
     width: 100%;
     height: 100%;
-    overflow: visible;
+    z-index: 2;
+    overflow: hidden;
 }
 
-/* ÁREAS DO MAPA */
-.arena-map-overlay path[data-map-area] {
+/* ==================================================
+   SETORES — CONFIGURAÇÃO GERAL
+================================================== */
+
+.arena-map-overlay .map-zone {
     cursor: pointer;
 
-    fill: #ffffff;
-    fill-opacity: .10;
-
+    stroke-width: 5px;
     stroke-linejoin: round;
     stroke-linecap: round;
     vector-effect: non-scaling-stroke;
+
+    fill-opacity: 0.12;
+
+    transition:
+        fill-opacity 0.25s ease,
+        stroke-width 0.25s ease,
+        filter 0.25s ease;
+}
+
+/* CORES DOS SETORES */
+
+.arena-map-overlay [data-map-area^="laranja"] {
+    fill: #ff8a00;
+    stroke: #ff8a00;
+}
+
+.arena-map-overlay [data-map-area^="vermelho"] {
+    fill: #ff3038;
+    stroke: #ff3038;
+}
+
+.arena-map-overlay [data-map-area^="amarelo"] {
+    fill: #facc15;
+    stroke: #facc15;
+}
+
+.arena-map-overlay [data-map-area^="azul"] {
+    fill: #3b82f6;
+    stroke: #3b82f6;
+}
+
+/* ==================================================
+   EFEITO AO PASSAR O MOUSE
+================================================== */
+
+@media (hover: hover) {
+    .arena-map-overlay .map-zone:hover {
+        fill-opacity: 0.30;
+        stroke-width: 7px;
+        filter: brightness(1.15);
+    }
+}
+
+/* ==================================================
+   SETOR SELECIONADO
+================================================== */
+
+.arena-map-overlay .map-zone.map-area-selected {
+    fill-opacity: 0.50;
+    stroke-width: 9px;
+    filter: brightness(1.20) drop-shadow(0 0 4px currentColor);
+    animation: sectorSelect 0.35s ease-out;
+}
+
+/* ANIMAÇÃO DE SELEÇÃO */
+
+@keyframes sectorSelect {
+    0% {
+        fill-opacity: 0.12;
+        stroke-width: 5px;
+        filter: brightness(1);
+    }
+
+    60% {
+        fill-opacity: 0.65;
+        stroke-width: 10px;
+        filter: brightness(1.30);
+    }
+
+    100% {
+        fill-opacity: 0.50;
+        stroke-width: 9px;
+        filter: brightness(1.20) drop-shadow(0 0 4px currentColor);
+    }
+}
+
+/* FOCO PELO TECLADO */
+
+.arena-map-overlay .map-zone:focus-visible {
+    outline: none;
+    stroke-width: 10px;
+}
+
+/* ==================================================
+   NÚMEROS DOS SETORES
+================================================== */
+
+.map-area-numbers {
+    pointer-events: none;
+    user-select: none;
+}
+
+.map-area-numbers text {
+    fill: #ffffff;
+    font-family: Arial, sans-serif;
+    font-size: 42px;
+    font-weight: 900;
+
+    text-anchor: middle;
+    dominant-baseline: middle;
+
+    paint-order: stroke;
+    stroke: #091426;
+    stroke-width: 3px;
+    stroke-linejoin: round;
+}
+
+/* ==================================================
+   LEGENDA DO MAPA
+================================================== */
+
+.map-area-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-top: 18px;
+
+    color: #cbd5e1;
+    font-size: 12px;
+}
+
+.map-area-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.map-area-legend i {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+/* CORES DA LEGENDA */
+
+.legend-orange {
+    background: #ff8a00;
+}
+
+.legend-red {
+    background: #ff3038;
+}
+
+.legend-yellow {
+    background: #facc15;
+}
+
+.legend-blue {
+    background: #3b82f6;
+}
+
+/* ==================================================
+   RESPONSIVIDADE
+================================================== */
+
+@media (max-width: 480px) {
+    .arena-map-container {
+        border-radius: 10px;
+    }
+
+    .map-area-numbers text {
+        font-size: 38px;
+    }
+
+    .map-area-legend {
+        gap: 12px;
+        font-size: 11px;
+    }
+}
+
+/* ==================================================
+   ACESSIBILIDADE — MOVIMENTO REDUZIDO
+================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .arena-map-overlay .map-zone {
+        transition: none;
+        animation: none !important;
+    }
+}
+
+
+/* =========================================
+   EFEITO AO PASSAR O MOUSE
+   Destaca levemente o setor antes do clique.
+========================================= */
+
+@media (hover: hover) {
+    .arena-map-overlay .map-zone:hover {
+        fill-opacity: 0.35;
+        stroke-width: 7px;
+        filter: brightness(1.12);
+    }
+}
+
+/* =========================================
+   SETOR SELECIONADO
+   Aumenta a espessura da borda e intensifica
+   o preenchimento sem alterar sua cor.
+========================================= */
+
+.arena-map-overlay .map-zone.map-area-selected {
+    fill-opacity: 0.48;
+    stroke-width: 8px;
+    filter: brightness(1.12);
+}
+
+/* =========================================
+   ACESSIBILIDADE
+   Destaca o setor quando navegado pelo teclado.
+========================================= */
+
+.arena-map-overlay .map-zone:focus-visible {
+    outline: none;
+    stroke-width: 9px;
+}
+
+/* =========================================
+   NUMERAÇÃO DOS SETORES
+   Os números ficam acima das áreas e não
+   bloqueiam os cliques nos caminhos SVG.
+========================================= */
+
+.map-area-numbers {
+    pointer-events: none;
+    user-select: none;
+}
+
+.map-area-numbers text {
+    fill: #ffffff;
+
+    font-family: Arial, sans-serif;
+    font-size: 42px;
+    font-weight: 900;
+
+    text-anchor: middle;
+    dominant-baseline: middle;
+
+    /* Contorno para facilitar a leitura */
+    paint-order: stroke;
+    stroke: #091426;
+    stroke-width: 3px;
+    stroke-linejoin: round;
+}
+
+/* =========================================
+   LEGENDA DAS CORES
+   Identifica as quatro áreas do mapa.
+========================================= */
+
+.map-area-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+
+    gap: 16px;
+    margin-top: 18px;
+
+    color: #cbd5e1;
+    font-size: 12px;
+}
+
+.map-area-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.map-area-legend i {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+/* Cores dos indicadores da legenda */
+.legend-orange { background: #ff8a00; }
+.legend-red    { background: #ff3038; }
+.legend-yellow { background: #facc15; }
+.legend-blue   { background: #3b82f6; }
+
+/* =========================================
+   RESPONSIVIDADE
+   Ajustes para celulares e telas menores.
+========================================= */
+
+@media (max-width: 480px) {
+    .arena-map-container {
+        border-radius: 10px;
+    }
+
+    .map-area-numbers text {
+        font-size: 38px;
+    }
+
+    .map-area-legend {
+        gap: 12px;
+        font-size: 11px;
+    }
+}
+
+
+/* HOVER */
+
+@media (hover: hover) {
+    .arena-map-overlay .map-zone:hover {
+        fill-opacity: 0.35;
+        stroke-width: 6px;
+        filter: brightness(1.12);
+    }
+}
+
+/* SETOR SELECIONADO */
+
+.arena-map-overlay .map-zone.map-area-selected {
+    fill-opacity: 0.48;
+    stroke-width: 8px;
+    filter: brightness(1.18);
+}
+
+/* FOCO PELO TECLADO */
+
+.arena-map-overlay .map-zone:focus-visible {
+    outline: none;
+    stroke-width: 8px;
+}
+
+/* =========================================
+   NÚMEROS DOS SETORES
+========================================= */
+
+.map-area-numbers {
+    pointer-events: none;
+    user-select: none;
+}
+
+.map-area-numbers text {
+    fill: #ffffff;
+    font-family: Arial, sans-serif;
+    font-size: 42px;
+    font-weight: 900;
+    text-anchor: middle;
+    dominant-baseline: middle;
+    paint-order: stroke;
+    stroke: rgba(9, 20, 38, 0.65);
+    stroke-width: 3px;
+    stroke-linejoin: round;
+}
+
+/* =========================================
+   LEGENDA
+========================================= */
+
+.map-area-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 18px;
+    color: #cbd5e1;
+    font-size: 12px;
+}
+
+.map-area-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.map-area-legend i {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.legend-orange { background: #ff8a00; }
+.legend-red { background: #ff3038; }
+.legend-yellow { background: #facc15; }
+.legend-blue { background: #3b82f6; }
+
+/* =========================================
+   RESPONSIVIDADE
+========================================= */
+
+@media (max-width: 480px) {
+    .arena-map-container {
+        border-radius: 10px;
+    }
+
+    .map-area-numbers text {
+        font-size: 38px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .arena-map-overlay .map-zone {
+        transition: none;
+    }
+}
+
+/* =========================================
+   INTERAÇÃO E ANIMAÇÃO DOS SETORES
+========================================= */
+
+/* Estado normal */
+.arena-map-overlay .map-zone {
+    transform-box: fill-box;
+    transform-origin: center;
+    transition:
+        fill-opacity .25s ease,
+        stroke-width .25s ease,
+        filter .25s ease,
+        transform .25s ease;
+}
+
+/* Ao passar o mouse */
+@media (hover: hover) {
+    .arena-map-overlay .map-zone:hover {
+        fill-opacity: .38;
+        stroke-width: 7px;
+        filter: brightness(1.15);
+    }
+}
+
+/* Setor selecionado */
+.arena-map-overlay .map-zone.map-area-selected {
+    fill-opacity: .55;
+    stroke-width: 9px;
+    filter: brightness(1.2);
+    transform: scale(1.025);
+}
+
+/* Animação ao selecionar */
+@keyframes sectorSelect {
+    0% {
+        fill-opacity: .20;
+        stroke-width: 5px;
+    }
+    50% {
+        fill-opacity: .65;
+        stroke-width: 10px;
+    }
+    100% {
+        fill-opacity: .55;
+        stroke-width: 9px;
+    }
+}
+
+.arena-map-overlay .map-zone.map-area-selected {
+    animation: sectorSelect .3s ease-out;
+}
+
+/* =========================================
+   MAPA — SELEÇÃO E ANIMAÇÃO DOS SETORES
+   Cole este bloco no FINAL do style.css
+========================================= */
+
+/* Configuração padrão das áreas */
+.arena-map-overlay .map-zone {
+    cursor: pointer;
+    stroke-width: 5px;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+
+    opacity: 1;
+    fill-opacity: 0.12;
 
     transform-box: fill-box;
     transform-origin: center;
 
     transition:
-        fill-opacity .2s ease,
-        transform .45s ease-out;
-
-    will-change: transform;
+        fill-opacity 0.3s ease,
+        stroke-width 0.3s ease,
+        filter 0.3s ease;
 }
 
-/* AO PASSAR O MOUSE */
-.arena-map-overlay path[data-map-area]:hover {
-    fill-opacity: .16;
-}
-
-/* ÁREA SELECIONADA */
-.arena-map-overlay path[data-map-area].map-area-selected {
-    fill-opacity: .22;
-    transform: scale(1.012);
-    transition: 1s;
-
-}
-
-/* =====================================================
-   CORES ORIGINAIS DAS BORDAS
-   ===================================================== */
-
-.arena-map-overlay path[data-map-area="vermelho"] {
-    stroke: #ff3038;
-}
-
-.arena-map-overlay path[data-map-area="laranja"] {
+/* Cores de cada setor */
+.arena-map-overlay [data-map-area^="laranja"] {
+    fill: #ff8a00;
     stroke: #ff8a00;
 }
 
-.arena-map-overlay path[data-map-area="roxo"] {
-    stroke: #a855f7;
+.arena-map-overlay [data-map-area^="vermelho"] {
+    fill: #ff3038;
+    stroke: #ff3038;
 }
 
-/* =====================================================
-   EFEITO AO PASSAR O MOUSE
-   ===================================================== */
-
-.arena-map-overlay path[data-map-area]:hover {
-    fill-opacity: .16;
+.arena-map-overlay [data-map-area^="amarelo"] {
+    fill: #facc15;
+    stroke: #facc15;
 }
 
+.arena-map-overlay [data-map-area^="azul"] {
+    fill: #3b82f6;
+    stroke: #3b82f6;
+}
 
+/* Efeito ao passar o mouse */
+@media (hover: hover) {
+    .arena-map-overlay .map-zone:hover {
+        fill-opacity: 0.25;
+        stroke-width: 7px;
+        filter: brightness(1.2);
+    }
+}
 
-/* =====================================================
-   FOCO E ACESSIBILIDADE DO MAPA
-   ===================================================== */
+/* Setor selecionado */
+.arena-map-overlay .map-zone.map-area-selected {
+    fill-opacity: 0.48;
+    stroke-width: 9px;
+    filter: brightness(1.25) drop-shadow(0 0 5px currentColor);
 
-.arena-map-overlay path[data-map-area]:focus,
-.arena-map-overlay path[data-map-area]:focus-visible {
+    animation: setorSelecionado 0.35s ease-out;
+}
+
+/* Animação de seleção */
+@keyframes setorSelecionado {
+    0% {
+        opacity: 0.55;
+    }
+
+    60% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Acessibilidade pelo teclado */
+.arena-map-overlay .map-zone:focus-visible {
     outline: none;
-}
-
-/* =====================================================
-   LEGENDA
-   ===================================================== */
-
-.map-area-legend {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 14px;
-    margin-top: 12px;
-    color: var(--arena-muted);
-    font-size: 12px;
-}
-
-.map-area-legend span {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.map-area-legend i {
-    display: inline-block;
-    width: 11px;
-    height: 11px;
-    flex-shrink: 0;
-    border-radius: 3px;
-}
-
-.legend-red {
-    background: var(--zone-red);
-}
-
-.legend-purple {
-    background: var(--zone-purple);
-}
-
-.legend-orange {
-    background: var(--zone-orange);
-}
-
-/* =====================================================
-   SELEÇÃO DE PAVIMENTOS
-   ===================================================== */
-
-.floor-options {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
-    width: 100%;
-}
-
-.floor-option {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    min-width: 0;
-    min-height: 48px;
-    padding: 12px 8px;
-
-    border: 1px solid #334155;
-    border-radius: 10px;
-
-    background: var(--arena-surface);
-    color: var(--arena-text);
-
-    font-size: 13px;
-    font-weight: 600;
-
-    cursor: pointer;
-    transition: .2s;
-}
-
-.floor-option:hover,
-.floor-option.active {
-    background: #4338ca;
-    border-color: #818cf8;
-    color: white;
-}
-
-/* =====================================================
-   CAMPOS DO FORMULÁRIO
-   ===================================================== */
-
-input,
-textarea,
-select {
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
-}
-
-#locationInput {
-    cursor: default;
-}
-
-/* =====================================================
-   ROLAGEM
-   ===================================================== */
-
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: var(--arena-bg);
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--arena-border);
-    border-radius: 8px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: #334155;
-}
-
-/* =====================================================
-   ACESSIBILIDADE
-   ===================================================== */
-
-button:focus-visible,
-input:focus-visible,
-textarea:focus-visible,
-select:focus-visible {
-    outline: 2px solid var(--arena-blue);
-    outline-offset: 3px;
-}
-
-/* =====================================================
-   RESPONSIVIDADE
-   ===================================================== */
-
-@media (max-width: 900px) {
-    .map-area-legend {
-        gap: 10px;
-    }
-}
-
-@media (max-width: 640px) {
-    .floor-options {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .floor-option {
-        min-height: 50px;
-        font-size: 12px;
-    }
-
-    .map-area-legend {
-        gap: 9px;
-        font-size: 11px;
-    }
-
-    ::-webkit-scrollbar {
-        width: 5px;
-        height: 5px;
-    }
-}
-
-/* =====================================================
-   MOVIMENTOS REDUZIDOS
-   ===================================================== */
-
-@media (prefers-reduced-motion: reduce) {
-    html {
-        scroll-behavior: auto;
-    }
-
-    *,
-    *::before,
-    *::after {
-        animation-duration: .01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: .01ms !important;
-    }
+    stroke-width: 10px;
 }
