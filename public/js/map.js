@@ -57,37 +57,42 @@ const MAP_AREAS = {
     }
 };
 
-/* ==================================================
+
+/* =========================================
    PAVIMENTOS DISPONÍVEIS
-================================================== */
+========================================= */
 
 const MAP_LEVELS = {
     laranja: [
-        { id: 'terreo', name: 'Térreo' },
-        { id: 'subsolo-2', name: '2º Subsolo' },
-        { id: 'subsolo-3', name: '3º Subsolo' },
-        { id: 'subsolo-4', name: '4º Subsolo' }
+        { id: 'subsolo-2', name: 'Subsolo 2' },
+        { id: 'subsolo-1', name: 'Subsolo 1' },
+        { id: 'nivel-1', name: 'Nível 1' },
+        { id: 'nivel-2', name: 'Nível 2' },
+        { id: 'nivel-3', name: 'Nível 3' }
     ],
 
     vermelho: [
-        { id: 'terreo', name: 'Térreo' },
-        { id: 'subsolo-2', name: '2º Subsolo' },
-        { id: 'subsolo-3', name: '3º Subsolo' },
-        { id: 'subsolo-4', name: '4º Subsolo' }
+        { id: 'subsolo-2', name: 'Subsolo 2' },
+        { id: 'subsolo-1', name: 'Subsolo 1' },
+        { id: 'nivel-1', name: 'Nível 1' },
+        { id: 'nivel-2', name: 'Nível 2' },
+        { id: 'nivel-3', name: 'Nível 3' }
     ],
 
     amarelo: [
-        { id: 'terreo', name: 'Térreo' },
-        { id: 'subsolo-2', name: '2º Subsolo' },
-        { id: 'subsolo-3', name: '3º Subsolo' },
-        { id: 'subsolo-4', name: '4º Subsolo' }
+        { id: 'subsolo-2', name: 'Subsolo 2' },
+        { id: 'subsolo-1', name: 'Subsolo 1' },
+        { id: 'nivel-1', name: 'Nível 1' },
+        { id: 'nivel-2', name: 'Nível 2' },
+        { id: 'nivel-3', name: 'Nível 3' }
     ],
 
     azul: [
-        { id: 'terreo', name: 'Térreo' },
-        { id: 'subsolo-2', name: '2º Subsolo' },
-        { id: 'subsolo-3', name: '3º Subsolo' },
-        { id: 'subsolo-4', name: '4º Subsolo' }
+        { id: 'subsolo-2', name: 'Subsolo 2' },
+        { id: 'subsolo-1', name: 'Subsolo 1' },
+        { id: 'nivel-1', name: 'Nível 1' },
+        { id: 'nivel-2', name: 'Nível 2' },
+        { id: 'nivel-3', name: 'Nível 3' }
     ]
 };
 
